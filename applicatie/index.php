@@ -15,5 +15,6 @@
     <br>
     <br>
     Een voorbeeld van een pagina die gegevens uit de database haalt vind je hier: <a href="componist-aantalstukken.php">http://<?=$_SERVER['HTTP_HOST']?>/componist-aantalstukken.php</a>
+    Home page<a href="GelreAirport/home.php">http://<?=$_SERVER['HTTP_HOST']?>Home page</a>
 </body>
 </html>

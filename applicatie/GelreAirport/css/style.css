@@ -1,0 +1,317 @@
+/* Main */
+
+* {
+	padding: 0;
+	margin: 0;
+}
+
+.container {
+	max-width: 1100px;
+	margin: 0 auto;
+	overflow: auto;
+	padding: 0 40px;
+}
+
+html{
+  background-color: #04427F;
+}
+
+body{
+  background-color: white;
+}
+
+a{
+  text-decoration: none;
+  color: black;
+}
+
+/* Button */
+.button {
+	display: inline-block;
+	padding: 10px 30px;
+	cursor: pointer;
+	color: black;
+	border-radius: 5px;
+  background-color: transparent;
+	border: 1px black solid;
+  text-decoration: none;
+}
+
+.button:hover {
+	transform: scale(.98);
+}
+
+/* Login */
+.loginForm{
+  margin: 10px 0px;
+}
+
+.formGroup{
+  margin: 10px 0px;
+}
+/* Navigation */
+
+.navbar {
+  padding: 10px;
+  background-color: #047aed;
+  color:white;
+  overflow: hidden;
+  display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+.navbar ul {
+  list-style: none;
+  display: flex;
+}
+
+.navbar li {
+  margin: 10px 0px 0px 20px;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.navbar ul ul {
+  display: none;
+  position: absolute;
+  background-color: #047aed;
+}
+
+.navbar ul li:hover > ul {
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar ul li:hover{
+  border-bottom: black solid 2px;
+}
+
+.navbar ul ul li {
+  padding: 10px 0px;
+  width: 100%;
+  margin: 0;
+}
+
+.navbar ul ul a {
+  padding: 10px 5px;
+}
+
+.navbar ul ul ul {
+  top: 0;
+  left: 100%;
+}
+
+/* Header */
+
+.header{
+  display: flex;
+  justify-content: space-between;
+}
+.header p{
+  color: black;
+}
+
+.header p:hover{
+  cursor: pointer;
+}
+
+.header h1{
+  margin: 10px 0px;
+}
+/* Homepage */
+.homegrid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  align-items: start;
+}
+
+
+.persoon{
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid black;
+  max-width: 300px;
+  margin: 10px 0px 20px 0px;
+}
+
+.persoon .button, .aankomendeVluchten .button{
+  margin-top: 8px;
+}
+/* flights */
+.aankomendeVluchten{
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid black;
+  max-width: 550px;
+  margin: 10px 0px 0px 0px;
+  grid-row: span 2;
+  margin: 0px 0px 20px 0px;
+}
+
+.aankomendeVluchtenUitgebreid, #passengerForm, #flightForm, .gegevens, .bagageInhoud{
+  display: flex;
+  flex-direction: column;
+  margin: 0px 0px 20px 0px;
+  border: 2px solid black;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.aankomendeVluchtenUitgebreid button{
+  padding: 3px;
+}
+
+.aankomendeVluchtenUitgebreid .searchContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Table */
+table{
+  border-collapse: collapse;
+}
+
+td, th{
+  border: 1px solid black;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #e4e4e4;
+}
+
+
+/* Form */
+#passengerForm, #flightForm, #registerForm, .gegevens, .bagageInhoud{
+  border-radius: 10px;
+  max-width: 400px;
+}
+
+form .data{
+  display: grid;
+}
+
+form input[type= 'submit']{
+  margin: 20px 0px 0px 0px;
+} 
+
+.formGrid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+}
+
+form select{
+  padding: 5px 50px;
+}
+/* Bagage */
+.bagage{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 50px;
+}
+
+.bagage img{
+  max-width: 200px;
+}
+
+.bagage .bagageInhoud{
+  display: block;
+  margin: 0px 0px 20px 0px;
+}
+
+.bagageInhoud img,
+.bagageInhoud p,
+.bagageInhoud input[type="number"],
+.bagageInhoud input[type="checkbox"] + label {
+  display: block;
+  padding-left: 0px;
+}
+
+form input [type="submit"]{
+  width: 100%;
+}
+
+.luggageGrid img{
+  max-width: 300px;
+}
+
+.luggageGrid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+}
+/* Flightstatus */
+.flightStatus{
+  border: 2px solid black;
+  margin: 0px 0px 20px 0px;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.flightStatus progress{
+  height: 20px;
+  width: 100%;
+  border-radius: 0px;
+}
+
+progress::-webkit-progress-bar {
+  background-color: #04427F;
+}
+progress::-webkit-progress-value {
+  background-color: #047aed;
+}
+
+.info{
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Footer */
+.footer{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: #04427F;
+}
+
+.footer a, .footer p, .footer h1 {
+	margin: 0px 10px;
+  color: white;
+  text-decoration: none;
+}
+
+.footer ul li, p{
+  list-style-type: none;
+  padding: 5px;
+}
+
+.footer ul li a:hover{
+	border-bottom: #fff solid 2px;
+}
+
+.footer i{
+  font-size: 2rem;
+}
+
+.fa-facebook, .fa-twitter, .fa-instagram{
+	transition: transform 0.2s ease-in;
+  color: white;
+}
+
+.fa-facebook:hover, .fa-twitter:hover, .fa-instagram:hover{
+	transform: translateY(-5px);
+}

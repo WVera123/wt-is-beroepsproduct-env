@@ -1,6 +1,6 @@
--- use master
--- create database GelreAirport
--- GO
+use master
+create database GelreAirport
+GO
 
 use GelreAirport
 
@@ -62,6 +62,16 @@ create table Passagier
   constraint pk_passagier primary key (passagiernummer),
   constraint ak_passagier unique(vluchtnummer, stoel)
 )
+create table Medewerker
+(
+  medewerkernummer		numeric(6)   not null,
+  naam					varchar(35)  not null,
+  maatschappijcode		char(2)   not null,
+  geslacht				char(1)              ,
+  wachtwoord			varchar(200) not null,
+  constraint pk_medewerker primary key (medewerkernummer),
+  constraint ak_medewerker unique(maatschappijcode)
+)
 
 create table IncheckenBestemming
 (
@@ -118,6 +128,11 @@ alter table Passagier
 alter table Passagier
   add constraint fk_passagier_balie foreign key (balienummer)
     references Balie (balienummer)
+      on update cascade
+
+alter table Medewerker
+  add constraint fk_medewerker_maatschappij foreign key (maatschappijcode)
+    references Maatschappij (maatschappijcode)
       on update cascade
 
 alter table IncheckenBestemming
@@ -187,13 +202,13 @@ INSERT INTO Luchthaven (luchthavencode, naam, land) VALUES
 ,('RTM', 'Rotterdam The Hague', 'Nederland')
 ,('TEU', 'Teuge International', 'Nederland')
 ,('LUX', 'Luchthaven Luxemburg', 'Luxemburg')
-,('LGG', 'Liege Airport', 'BelgiÃ«')
-,('ANR', 'Luchthaven Antwerpen', 'BelgiÃ«')
-,('CRL', 'Brussels South Charleroi', 'BelgiÃ«')
-,('AIP', 'Vliegveld Grimbergen', 'BelgiÃ«')
-,('KJK', 'Luchthaven Kortrijk', 'BelgiÃ«')
-,('OST', 'Luchthaven Oostende', 'BelgiÃ«')
-,('BRU', 'Brussels Airport', 'BelgiÃ«')
+,('LGG', 'Liege Airport', 'België')
+,('ANR', 'Luchthaven Antwerpen', 'België')
+,('CRL', 'Brussels South Charleroi', 'België')
+,('AIP', 'Vliegveld Grimbergen', 'België')
+,('KJK', 'Luchthaven Kortrijk', 'België')
+,('OST', 'Luchthaven Oostende', 'België')
+,('BRU', 'Brussels Airport', 'België')
 
 go
 
