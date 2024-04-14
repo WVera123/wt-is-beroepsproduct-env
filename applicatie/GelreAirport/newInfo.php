@@ -1,77 +1,99 @@
 <?php
 session_start();
-if(!$_SESSION['medewerker']){
+if(!isset($_SESSION['medewerker'])){
   $melding = 'Log eerst in voordat u deze pagina bezoekt!';
   header("location:home.php");
   die;
 }
 require_once 'db_connectie.php';
+require_once 'components/header.php';
+require_once 'components/footer.php';
+require_once 'components/navigation.php';
+
 $melding = '';
 $fouten = [];
-$query = null;
+
 if (isset($_POST['nieuwePassagier'])) {
-    $passagiernummer = $_POST['passagiernummer'];
-    $achternaam = $_POST['achternaam'];
-    $vluchtnummer = $_POST['vluchtnummer'];
-    $geslacht = $_POST['geslacht'];
-    $balienummer = $_POST['stoel'];
-    $stoel = $_POST['stoel'];
-    $incheckDatumTijd = $_POST['incheckdatum'] . " " . $_POST['inchecktijdstip'];
-    $rolOptie = 'passagier';
-    $wachtwoord = $_POST['wachtwoord'];
-    $wachtwoordCheck = $_POST['wachtwoordCheck'];
+  $passagiernummer = $_POST['passagiernummer'];
+  $achternaam = $_POST['achternaam'];
+  $vluchtnummer = $_POST['vluchtnummer'];
+  $geslacht = $_POST['geslacht'];
+  $balienummer = $_POST['balienummer'];
+  $stoel = $_POST['stoel'];
+  $incheckDatumTijd = $_POST['incheckdatum'] . " " . $_POST['inchecktijdstip'];
+  $wachtwoord = $_POST['wachtwoord'];
+  $wachtwoordCheck = $_POST['wachtwoordCheck'];
 
-    if (strlen($geslacht) != 1 || !in_array($geslacht, ['V', 'M', 'x'])) {
-        $fouten[] = "Druk het geslacht uit in 'V', 'M' of 'x'!";
+  if (strlen($geslacht) != 1 || !in_array($geslacht, ['V', 'M', 'x'])) {
+    $fouten[] = "Druk het geslacht uit in 'V', 'M' of 'x'!";
+  }
+
+  if (strlen($wachtwoord) < 8) {
+    $fouten[] = 'Het wachtwoord moet minstens 8 karakters zijn!';
+  }
+
+  if ($wachtwoord != $wachtwoordCheck) {
+    $fouten[] = 'De wachtwoorden komen niet overeen!';
+  }
+
+  if (count($fouten) > 0) {
+    $melding = "Er waren fouten in de invoer.<ul>";
+    foreach ($fouten as $fout) {
+      $melding .= "<li>$fout</li>";
     }
+    $melding .= "</ul>";
 
-    if (strlen($wachtwoord) < 8) {
-        $fouten[] = 'Het wachtwoord moet minstens 8 karakters zijn!';
+  } else {
+    $passwordhash = password_hash($wachtwoord, PASSWORD_DEFAULT);
+    $db = maakVerbinding();
+
+    $queryPassagierCount = 'SELECT COUNT(*) AS passagierCount
+                            FROM Passagier 
+                            WHERE vluchtnummer = :vluchtnummer';
+
+    $dataPassagierCount = $db->prepare($queryPassagierCount);
+    $dataPassagierCount->bindParam(':vluchtnummer', $vluchtnummer);
+    $dataPassagierCount->execute();
+    $resultaatPassengerCount = $dataPassagierCount->fetchColumn();
+
+
+    $queryMaxAantal = 'SELECT max_aantal 
+                      FROM Vlucht 
+                      WHERE vluchtnummer = :vluchtnummer';
+    $dataMaxAantal = $db->prepare($queryMaxAantal);
+    $dataMaxAantal->bindParam(':vluchtnummer', $vluchtnummer);
+    $dataMaxAantal->execute();
+    $resultaatMaxAantal = $dataMaxAantal->fetchColumn();
+
+    if($resultaatPassengerCount >= $resultaatMaxAantal){
+      $melding = "Het maximum aantal passagiers voor deze vlucht ($resultaatMaxAantal) is al bereikt.";
+    }else{
+      $sql = 'INSERT INTO Passagier(passagiernummer, naam, vluchtnummer, geslacht, balienummer, stoel, inchecktijdstip, wachtwoord)
+              SELECT :passagiernummer, :naam, :vluchtnummer, :geslacht, :balienummer, :stoel, :inchecktijdstip, :wachtwoord';
+      $query = $db->prepare($sql);
+
+      $data_array = [
+        ':passagiernummer' => $passagiernummer,
+        ':naam' => $achternaam,
+        ':vluchtnummer' => $vluchtnummer,
+        ':geslacht' => $geslacht,
+        ':balienummer' => $balienummer,
+        ':stoel' => $stoel,
+        ':inchecktijdstip' => $incheckDatumTijd,
+        ':wachtwoord' => $passwordhash
+      ];
+      $succes = $query->execute($data_array);
+
+      if($succes)
+      {
+        $melding = 'Gebruiker is geregistreerd!';
+      }
+      else
+      {
+        $melding = 'Registratie is mislukt!';
+      }
     }
-
-    if ($wachtwoord != $wachtwoordCheck) {
-        $fouten[] = 'De wachtwoorden komen niet overeen!';
-    }
-
-    if (count($fouten) > 0) {
-        $melding = "Er waren fouten in de invoer.<ul>";
-        foreach ($fouten as $fout) {
-            $melding .= "<li>$fout</li>";
-        }
-        $melding .= "</ul>";
-
-    } else {
-        $passwordhash = password_hash($wachtwoord, PASSWORD_DEFAULT);
-        $db = maakVerbinding();
-        $sql = 'INSERT INTO Passagier (passagiernummer, naam, vluchtnummer, geslacht, balienummer, stoel, inchecktijdstip, wachtwoord)
-                SELECT :passagiernummer, :naam, :vluchtnummer, :geslacht, :balienummer, :stoel, :inchecktijdstip, :wachtwoord
-                FROM Passagier P
-                INNER JOIN Vlucht V ON P.vluchtnummer = V.vluchtnummer
-                GROUP BY passagiernummer, naam, P.vluchtnummer, geslacht, balienummer, stoel, inchecktijdstip, wachtwoord, max_aantal
-                HAVING COUNT(passagiernummer) < max_aantal';
-        $query = $db->prepare($sql);
-
-        $data_array = [
-            ':passagiernummer' => (int)$passagiernummer,
-            ':naam' => $achternaam,
-            ':vluchtnummer' => (int)$vluchtnummer,
-            ':geslacht' => $geslacht,
-            ':balienummer' => (int)$balienummer,
-            ':stoel' => $stoel,
-            ':inchecktijdstip' => $incheckDatumTijd,
-            ':wachtwoord' => $passwordhash
-        ];
-    }
-    $succes = $query->execute($data_array);
-
-    if($succes)
-    {
-        $melding = 'Gebruiker is geregistreerd.';
-    }
-    else
-    {
-        $melding = 'Registratie is mislukt.';
-    }
+  }
 }
 
 if(isset($_POST['nieuweVlucht'])){
@@ -97,68 +119,41 @@ if(isset($_POST['nieuweVlucht'])){
   }else{
     $db = maakVerbinding();
     $sql = 'INSERT INTO Vlucht (vluchtnummer, bestemming, gatecode, max_aantal, max_gewicht_pp, max_totaalgewicht, vertrektijd, maatschappijcode)
-        VALUES(:vluchtnummer, :bestemming, :gatecode, :max_aantal, :max_gewicht_pp, :max_totaalgewicht, :vertrektijd, :maatschappijcode)';
+            VALUES(:vluchtnummer, :bestemming, :gatecode, :max_aantal, :max_gewicht_pp, :max_totaalgewicht, :vertrektijd, :maatschappijcode)';
     $query = $db->prepare($sql);
 
     $data_array = [
-        ':vluchtnummer' => $vluchtnummer,
-        ':bestemming' => $bestemming,
-        ':gatecode' => $gatecode,
-        ':max_aantal' => $maxAantal,
-        ':max_gewicht_pp' => $maxGewicht,
-        ':max_totaalgewicht' => $maxTotaalGewicht,
-        ':vertrektijd' => $vertrektijd,
-        ':maatschappijcode' => $maatschappijcode
+      ':vluchtnummer' => $vluchtnummer,
+      ':bestemming' => $bestemming,
+      ':gatecode' => $gatecode,
+      ':max_aantal' => $maxAantal,
+      ':max_gewicht_pp' => $maxGewicht,
+      ':max_totaalgewicht' => $maxTotaalGewicht,
+      ':vertrektijd' => $vertrektijd,
+      ':maatschappijcode' => $maatschappijcode
     ];
 
-    $success = $query->execute($data_array);
+    $succes = $query->execute($data_array);
 
-    if ($success) {
-      $melding = 'Vlucht is toegevoegd!.';
+    if ($succes) {
+      $melding = 'Vlucht is toegevoegd!';
     } else {
-      $melding = 'Vlucht toevoegen is mislukt.';
+      $melding = 'Vlucht toevoegen is mislukt!';
     }
   }
 }
+echo genereerHead();
 ?>
-<!DOCTYPE html>
-<html lang="nl">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="stylesheet" href="css/style.css">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-      <title>Gelre Airport</title>
-  </head>
   <body>
-  <nav class="navbar">
-    <h1 class="logo">Gelre Airport</h1>
-    <ul>
-      <li><a href="home.php">Home</a></li>
-      <li><a href="flights.php">Vluchten</a></li>
-      <li><a href="checkin.php">Bagage check-in</a></li>
-      <li>
-        <a href="#">Passagier</a>
-        <ul>
-          <li><a href="passengerInfo.php">Gegevens</a></li>
-        </ul>
-      </li>
-      <li>
-        <a href="#">Medewerker</a>
-        <ul>
-          <li><a href="allFlights.php">Alle vluchten</a></li>
-          <li><a href="newInfo.php">Gegevensinvoer</a></li>
-        </ul>
-      </li>
-    </ul>
-  </nav>
+  <?= genereerNav();?>
     <header class="container">
       <div class="header">
         <h1>Gegevensinvoer</h1>
-        <p>Ingelogd</p>
+        <a href="logout.php">Log uit</a>
       </div>
     </header>
     <main class="container">
+      <?= $melding ?>
       <div class="formGrid">
         <form action="newinfo.php" id="passengerForm" method="POST">
           <h2>Voer een nieuwe passagier in</h2>
@@ -227,28 +222,6 @@ if(isset($_POST['nieuweVlucht'])){
         </form>
       </div>
     </main>
-    <footer>
-    <div class="footer">
-      <div>
-        <h1>Gelre Airport</h1>
-        <p>Copyright &copy; 2023</p>
-      </div>
-      <nav>
-        <ul>
-          <li><a href="home.php">Home</a></li>
-          <li><a href="flights.php">Vluchten</a></li>
-          <li><a href="checkin.php">Check-in</a></li>
-          <li><a href="passengerInfo.php">Gegevens</a></li>
-          <li><a href="newInfo.php">Nieuwe gegevens</a></li>
-          <li><a href="allFlights.php">Alle vluchten</a></li>
-        </ul>
-      </nav>
-      <div class="social">
-        <a href="#" target="_blank" ><i class="fa fa-facebook"></i></a>
-        <a href="#" target="_blank"><i class="fa fa-twitter"></i></a>
-        <a href="#" target="_blank"><i class="fa fa-instagram"></i></a>
-      </div>
-    </div>
-    </footer>
+    <?= genereerFooter();?>
   </body>
 </html>

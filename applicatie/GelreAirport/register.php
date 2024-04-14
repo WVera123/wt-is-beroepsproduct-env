@@ -1,5 +1,8 @@
 <?php
 require_once 'db_connectie.php';
+require_once 'components/header.php';
+require_once 'components/footer.php';
+require_once 'components/navigation.php';
 
 $melding = '';
 
@@ -130,7 +133,6 @@ if(isset($_POST['registeren'])) {
     $passwordhash = password_hash($wachtwoord, PASSWORD_DEFAULT);
     $db = maakVerbinding();
     if($formulier == $htmlFormPassagier) {
-      echo('test');
       $sql = 'INSERT INTO Passagier(passagiernummer, naam, vluchtnummer, geslacht, balienummer, stoel, inchecktijdstip, wachtwoord)
       VALUES (:passagiernummer, :naam, :vluchtnummer, :geslacht, :balienummer, :stoel, :incheckdatumtijd, :wachtwoord)';
 
@@ -159,6 +161,17 @@ if(isset($_POST['registeren'])) {
       }
     }
     else if($formulier == $htmlFormMedewerker) {
+      $insertSql = 'CREATE TABLE Medewerker(
+        medewerkernummer		numeric(6)   not null,
+        naam					      varchar(35)  not null,
+        maatschappijcode		char(2)   not null,
+        geslacht				    char(1)              ,
+        wachtwoord			    varchar(200) not null,
+        constraint pk_medewerker primary key (medewerkernummer),
+        constraint ak_medewerker unique(maatschappijcode)
+      )';
+      $insertQuery = $db->prepare($insertSql);
+      $insertQuery->execute();
       $sql = 'INSERT INTO Medewerker(medewerkernummer, naam, maatschappijcode, geslacht, wachtwoord)
               values (:medewerkernummer, :naam, :maatschappijcode, :geslacht, :wachtwoord)';
       $query = $db->prepare($sql);
@@ -184,40 +197,10 @@ if(isset($_POST['registeren'])) {
     }
   }
 }
-
+echo genereerHead();
 ?>
-
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Gelre Airport</title>
-</head>
 <body>
-<nav class="navbar">
-    <h1 class="logo">Gelre Airport</h1>
-    <ul>
-      <li><a href="home.php">Home</a></li>
-      <li><a href="flights.php">Vluchten</a></li>
-      <li><a href="checkin.php">Bagage check-in</a></li>
-      <li>
-        <a href="#">Passagier</a>
-        <ul>
-          <li><a href="passengerInfo.php">Gegevens</a></li>
-        </ul>
-      </li>
-      <li>
-        <a href="#">Medewerker</a>
-        <ul>
-          <li><a href="allFlights.php">Alle vluchten</a></li>
-          <li><a href="newInfo.php">Gegevensinvoer</a></li>
-        </ul>
-      </li>
-    </ul>
-  </nav>
+<?= genereerNav();?>
   <header class="container">
     <div class="header">
       <h1>Registreren</h1>
@@ -235,7 +218,7 @@ if(isset($_POST['registeren'])) {
           </select>
         </div>
         <div class="formGroup">
-          <button type="submit" name="keuze" class="Button">Maak een keuze</button>
+          <button type="submit" name="keuze" class="button">Maak een keuze</button>
         </div>
       </form>
     </div>
@@ -248,29 +231,7 @@ if(isset($_POST['registeren'])) {
       <?=$melding?>
     </div>
   </main>
-  <footer>
-  <div class="footer">
-      <div>
-        <h1>Gelre Airport</h1>
-        <p>Copyright &copy; 2023</p>
-      </div>
-      <nav>
-        <ul>
-          <li><a href="home.php">Home</a></li>
-          <li><a href="flights.php">Vluchten</a></li>
-          <li><a href="checkin.php">Check-in</a></li>
-          <li><a href="passengerInfo.php">Gegevens</a></li>
-          <li><a href="newInfo.php">Nieuwe gegevens</a></li>
-          <li><a href="allFlights.php">Alle vluchten</a></li>
-        </ul>
-      </nav>
-      <div class="social">
-        <a href="#" target="_blank" ><i class="fa fa-facebook"></i></a>
-        <a href="#" target="_blank"><i class="fa fa-twitter"></i></a>
-        <a href="#" target="_blank"><i class="fa fa-instagram"></i></a>
-      </div>
-    </div>
-  </footer>
+  <?= genereerFooter();?>
 </body>
 </html>
 

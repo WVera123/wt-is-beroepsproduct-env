@@ -20,6 +20,12 @@ body{
   background-color: white;
 }
 
+h3{
+  background-color: lightgreen;
+  font-weight: bold;
+  padding: 10px;
+}
+
 a{
   text-decoration: none;
   color: black;
@@ -174,6 +180,10 @@ a{
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.aankomendeVluchtenUitgebreid a {
+  text-decoration: underline;
 }
 
 /* Table */
