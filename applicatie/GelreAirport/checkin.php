@@ -110,11 +110,6 @@ if (isset($_POST['verzend'])) {
         $fouten[] = "Uw bagage is te zwaar. De totale limiet is $maxGewichtPp kg.";
       }
 
-      //Voorkomt overtreding totale gewicht aan bagage van vlucht.
-      if ($maxPassagiers * $maxGewichtPp > $maxGewicht) {
-        $fouten[] = "Fout in systeem. Maximaal toegestane gewicht kan worden overschreden.";
-      }
-
       if (count($fouten) > 0) {
         $melding = "Er waren fouten in de invoer.<ul>";
         foreach ($fouten as $fout) {

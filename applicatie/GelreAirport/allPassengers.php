@@ -90,6 +90,7 @@ echo genereerHead();
       <h1>Alle passagiers</h1>
       <?php checkInOfUitgelogd()?>
     </div>
+    <?=checkVoorMeldingen(); ?>
   </header>
   <main class="container">
     <div class="aankomendeVluchtenUitgebreid">

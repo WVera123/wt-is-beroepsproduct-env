@@ -144,7 +144,9 @@ if (isset($_POST['nieuweVlucht'])) {
   $maxAantal = $_POST['max_aantal'];
   $maxGewichtPp = $_POST['max_gewichtpp'];
   $maxTotaalGewicht = $_POST['max_totaalgewicht'];
-  $vertrektijd = $_POST['vertrektijd'];
+  $vertrekDatum = isset($_POST['vertrekdatum']) ? $_POST['vertrekdatum'] : NULL;
+  $vertrekTijd = isset($_POST['vertrektijd']) ? $_POST['vertrektijd'] : NULL;
+  $vertrekDatumTijd = ($vertrekDatum && $vertrekTijd) ? "$vertrekDatum $vertrekTijd" : NULL;
   $maatschappijcode = $_POST['maatschappijcode'];
 
   // Check of passagiernummer al bestaat
@@ -163,8 +165,19 @@ if (isset($_POST['nieuweVlucht'])) {
     $fouten[] = 'De maatschappijcode mag niet langer dan 2 letters zijn.';
   }
 
-  if ($vertrektijd < date('Y-m-d H:i:s')) {
-    $fouten[] = 'De vertrekdatum mag niet in het verleden liggen..';
+  if ($vertrekDatum != NULL) {
+    if ($vertrekDatumTijd < date('Y-m-d H:i:s')) {
+      $fouten[] = 'De vertrekdatum mag niet in het verleden liggen..';
+    }
+  }
+
+  if ($gatecode == 'null') {
+    $gatecode = NULL;
+  }
+
+  //Voorkomt overtreding totale gewicht aan bagage van vlucht.
+  if ($maxAantal * $maxGewichtPp > $maxTotaalGewicht) {
+    $fouten[] = "Fout in systeem. Maximaal toegestane gewicht kan worden overschreden.";
   }
 
   if (count($fouten) > 0) {
@@ -185,7 +198,7 @@ if (isset($_POST['nieuweVlucht'])) {
       ':max_aantal' => $maxAantal,
       ':max_gewicht_pp' => $maxGewichtPp,
       ':max_totaalgewicht' => $maxTotaalGewicht,
-      ':vertrektijd' => $vertrektijd,
+      ':vertrektijd' => $vertrekDatumTijd,
       ':maatschappijcode' => $maatschappijcode
     ];
 
@@ -267,6 +280,7 @@ echo genereerHead();
 
           <label for="gatecode">Gatecode:</label>
           <select name="gatecode" id="gatecode">
+            <option value="null">Kies een gatecode</option>
             <?= selecteerGate($db) ?>
           </select>
 
@@ -279,8 +293,11 @@ echo genereerHead();
           <label for="max_totaalgewicht">Max. totaal gewicht*:</label>
           <input type="number" name="max_totaalgewicht" id="max_totaalgewicht" required>
 
+          <label for="vertrekdatum">Vertrekdatum:</label>
+          <input type="date" name="vertrekdatum" id="vertrekdatum">
+
           <label for="vertrektijd">Vertrektijd:</label>
-          <input type="date" name="vertrektijd" id="vertrektijd">
+          <input type="time" name="vertrektijd" id="vertrektijd">
 
           <label for="maatschappijcode">Maatschappijcode*:</label>
           <select name="maatschappijcode" id="maatschappijcode" required>

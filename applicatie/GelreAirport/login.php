@@ -12,40 +12,55 @@ if (isset($_SESSION['passagier']) || isset($_SESSION['medewerker'])) {
   $melding = '';
 
   if (isset($_POST['inloggen'])) {
+    $choice = $_POST['choice'];
     $nummer = $_POST['nummer'];
     $wachtwoord = $_POST['wachtwoord'];
 
-    if (empty($nummer) || empty($wachtwoord)) {
+    if (empty($choice) || empty($nummer) || empty($wachtwoord)) {
       $melding = 'Fout: niet alle velden zijn ingevuld!';
     } else {
       $db = maakVerbinding();
+      if ($choice == 'passagier') {
+        $passagierQuery = $db->prepare('SELECT passagiernummer, wachtwoord 
+                                        FROM Passagier 
+                                        WHERE passagiernummer = :passagiernummer');
+        $passagierQuery->execute([':passagiernummer' => $nummer]);
+        if ($passagierRow = $passagierQuery->fetch()) {
+          $wachtwoordHash = $passagierRow['wachtwoord'];
 
-      $passagierQuery = $db->prepare('SELECT passagiernummer, wachtwoord 
-                                      FROM Passagier 
-                                      WHERE passagiernummer = :passagiernummer');
-      $passagierQuery->execute([':passagiernummer' => $nummer]);
-      $passagierRow = $passagierQuery->fetch();
+          if (password_verify($wachtwoord, $wachtwoordHash)) {
+            $_SESSION['passagier'] = $nummer;
+            header("Location: home.php?melding=U bent ingelogd als passagier $nummer.");
+          } else {
+            $melding = 'Fout: incorrecte inloggegevens.';
+          }
+        } else {
+          $melding = 'Fout: incorrecte inloggegevens.';
+        }
+      } else if ($choice == 'medewerker') {
+        $medewerkerQuery = $db->prepare('SELECT medewerkernummer, wachtwoord 
+                                          FROM Medewerker 
+                                          WHERE medewerkernummer = :medewerkernummer');
+        $medewerkerQuery->execute([':medewerkernummer' => $nummer]);
+        if ($medewerkerRow = $medewerkerQuery->fetch()) {
+          $wachtwoordHash = $medewerkerRow['wachtwoord'];
 
-      $medewerkerQuery = $db->prepare('SELECT medewerkernummer, wachtwoord 
-                                        FROM Medewerker 
-                                        WHERE medewerkernummer = :medewerkernummer');
-      $medewerkerQuery->execute([':medewerkernummer' => $nummer]);
-      $medewerkerRow = $medewerkerQuery->fetch();
-
-      $passagierPasswordhash = $passagierRow; //IMPROVE, NOT HASHED & DOESNT CHECK
-      $medewerkerPasswordhash = $medewerkerRow; //IMPROVE, NOT HASHED & DOESNT CHECK
-      if ($passagierRow && $passagierPasswordhash) {
-        $_SESSION['passagier'] = $nummer;
-        header("location:home.php?melding=Passagier is ingelogd.");
-      } elseif ($medewerkerRow && $medewerkerPasswordhash) {
-        $_SESSION['medewerker'] = $nummer;
-        header("location:home.php?melding=Medewerker is ingelogd.");
+          if (password_verify($wachtwoord, $wachtwoordHash)) {
+            $_SESSION['medewerker'] = $nummer;
+            header("Location: home.php?melding=U bent ingelogd als medewerker $nummer.");
+          } else {
+            $melding = 'Fout: incorrecte inloggegevens.';
+          }
+        } else {
+          $melding = 'Fout: incorrecte inloggegevens.';
+        }
       } else {
-        $melding = 'Fout: incorrecte inloggegevens!';
+        $melding = 'Er is geen geldige keuze gemaakt.';
       }
     }
   }
 }
+
 echo genereerHead();
 ?>
 
@@ -61,15 +76,23 @@ echo genereerHead();
       <?= $melding ?>
       <form class="loginForm" action="login.php" method="post">
         <div class="formGroup">
+          <label for="choice">Wilt u inloggen als passagier of medewerker?</label>
+          <select name="choice" id="choice" required>
+            <option value="passagier" selected>Passagier</option>
+            <option value="medewerker">Medewerker</option>
+          </select>
+        </div>
+        <div class="formGroup">
           <label for="nummer">Nummer:</label>
           <input type="text" id="nummer" name="nummer" required>
-          <div class="formGroup">
-            <label for="wachtwoord">Wachtwoord:</label>
-            <input type="password" id="wachtwoord" name="wachtwoord" required>
-          </div>
-          <div class="formGroup">
-            <button type="submit" name="inloggen" class="button">Inloggen</button>
-          </div>
+        </div>
+        <div class="formGroup">
+          <label for="wachtwoord">Wachtwoord:</label>
+          <input type="password" id="wachtwoord" name="wachtwoord" required>
+        </div>
+        <div class="formGroup">
+          <button type="submit" name="inloggen" class="button">Inloggen</button>
+        </div>
       </form>
     </div>
   </main>

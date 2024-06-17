@@ -1,9 +1,8 @@
 <?php
 session_start();
-if(!$_SESSION['medewerker']){
-  $melding = 'Log eerst in als medewerkervoordat u deze pagina bezoekt!';
-  header("location:home.php");
-  die;
+if (!$_SESSION['medewerker']) {
+    header("location:home.php?melding=Log eerst in als medewerker voordat u deze pagina bezoekt.");
+    die;
 }
 
 require_once 'db_connectie.php';
@@ -13,24 +12,23 @@ require_once 'components/footer.php';
 require_once 'components/header.php';
 
 $melding = '';
+$fouten = [];
+
+if(!isset($_GET['passagiernummer'])){
+    header("location:allPassengers.php?melding=Geen passagier geselecteerd.");
+}
 
 $passagiernummer = isset($_GET['passagiernummer']) ? $_GET['passagiernummer'] : '';
 
 $db = maakVerbinding();
 
-
 $query = 'SELECT passagiernummer, naam, vluchtnummer, balienummer, stoel, inchecktijdstip
-          FROM Passagier';
-
-if (!empty($passagiernummer)) {
-    $query .= ' WHERE passagiernummer = :passagiernummer';
-}
+          FROM Passagier 
+          WHERE passagiernummer = :passagiernummer';
 
 $data = $db->prepare($query);
 
-if (!empty($passagiernummer)) {
-    $data->bindParam(':passagiernummer', $passagiernummer);
-}
+$data->bindParam(':passagiernummer', $passagiernummer);
 
 $data->execute();
 
@@ -43,44 +41,77 @@ while ($rij = $data->fetch()) {
     $inchecktijdstip = $rij['inchecktijdstip'];
 }
 
-if(isset($_POST['update'])) {
-    
+if (isset($_POST['update'])) {
+
     $updatedPassagiernummer = $_POST['passagiernummer'];
     $updatedVluchtnummer = $_POST['vluchtnummer'];
     $updatedBalienummer = $_POST['balienummer'];
     $updatedStoelnummer = $_POST['stoel'];
 
-    $updateQuery = 'UPDATE Passagier 
-                    SET vluchtnummer = :vluchtnummer, balienummer = :balienummer, stoel = :stoel
-                    WHERE passagiernummer = :passagiernummer';
+    // Check of vluchtnummernummer bestaat
+    $queryCheckVluchtNum = "SELECT COUNT(*) AS count 
+                            FROM Vlucht 
+                            WHERE vluchtnummer = :vluchtnummer";
+    $dataCheckVluchtNum = $db->prepare($queryCheckVluchtNum);
+    $dataCheckVluchtNum->execute([':vluchtnummer' => $updatedVluchtnummer]);
+    $resultVluchtnummer = $dataCheckVluchtNum->fetch(PDO::FETCH_ASSOC);
 
-    $updateData = $db->prepare($updateQuery);
-    $updateData->bindParam(':vluchtnummer', $updatedVluchtnummer);
-    $updateData->bindParam(':balienummer', $updatedBalienummer);
-    $updateData->bindParam(':stoel', $updatedStoelnummer);
-    if (!empty($updatedPassagiernummer)) {
-        $updateData->bindParam(':passagiernummer', $updatedPassagiernummer);
+    if ($resultVluchtnummer['count'] <= 0) {
+        $fouten[] = 'Deze vlucht bestaat niet.';
     }
-    $updateData->execute();
 
-    header("Location: edit.php?passagiernummer=$updatedPassagiernummer");
-    $melding = 'Informatie is succesvol veranderd.';
+    // Check of stoel is bezet
+    $queryCheckStoel = "SELECT COUNT(*) AS count 
+                        FROM Passagier 
+                        WHERE stoel = :stoel AND vluchtnummer = :vluchtnummer";
+    $dataCheckStoel = $db->prepare($queryCheckStoel);
+    $dataCheckStoel->execute([':stoel' => $updatedStoelnummer, ':vluchtnummer' => $updatedVluchtnummer]);
+    $resultStoel = $dataCheckStoel->fetch(PDO::FETCH_ASSOC);
+
+    if ($resultStoel['count'] > 0) {
+        $fouten[] = 'Deze stoel is al bezet.';
+    }
+
+    if (count($fouten) > 0) {
+        $melding = "Er waren fouten in de invoer.<ul>";
+        foreach ($fouten as $fout) {
+            $melding .= "<li>$fout</li>";
+        }
+        $melding .= "</ul>";
+    } else {
+
+        $updateQuery = 'UPDATE Passagier 
+                        SET vluchtnummer = :vluchtnummer, balienummer = :balienummer, stoel = :stoel
+                        WHERE passagiernummer = :passagiernummer';
+
+        $updateData = $db->prepare($updateQuery);
+        $updateData->bindParam(':vluchtnummer', $updatedVluchtnummer);
+        $updateData->bindParam(':balienummer', $updatedBalienummer);
+        $updateData->bindParam(':stoel', $updatedStoelnummer);
+        if (!empty($updatedPassagiernummer)) {
+            $updateData->bindParam(':passagiernummer', $updatedPassagiernummer);
+        }
+        $updateData->execute();
+
+        header("Location: edit.php?passagiernummer=$updatedPassagiernummer");
+        $melding = 'Informatie is succesvol veranderd.';
+    }
 }
 
 echo genereerHead();
 ?>
 
 <body>
-    <?= genereerNav();?>
+    <?= genereerNav(); ?>
     <header class="container">
         <div class="header">
             <h1>Edit Passenger Information</h1>
-            <?php checkInOfUitgelogd()?>
+            <?php checkInOfUitgelogd() ?>
         </div>
     </header>
     <main class="container">
-        <h3><?=$melding?></h3>
-        <form action="edit.php" id="passengerForm" method="POST">
+        <?= $melding ?>
+        <form action="#" id="passengerForm" method="POST">
             <label for="passagiernummer">Passagiernummer:</label>
             <input type="text" name="passagiernummer" value="<?= $passagiernummer ?>" readonly>
 
