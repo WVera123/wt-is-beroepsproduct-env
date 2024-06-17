@@ -57,18 +57,19 @@ create table Passagier
   geslacht        char(1)              ,
   balienummer     numeric(2)           ,
   stoel           char(3)              ,
-  inchecktijdstip datetime             , 
-  wachtwoord      varchar(200) not null,
+  inchecktijdstip datetime     DEFAULT CURRENT_TIMESTAMP, 
+  wachtwoord      varchar(255) not null,
   constraint pk_passagier primary key (passagiernummer),
   constraint ak_passagier unique(vluchtnummer, stoel)
 )
+
 create table Medewerker
 (
   medewerkernummer		numeric(6)   not null,
   naam					varchar(35)  not null,
   maatschappijcode		char(2)   not null,
   geslacht				char(1)              ,
-  wachtwoord			varchar(200) not null,
+  wachtwoord			varchar(255) not null,
   constraint pk_medewerker primary key (medewerkernummer),
   constraint ak_medewerker unique(maatschappijcode)
 )

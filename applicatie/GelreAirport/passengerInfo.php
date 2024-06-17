@@ -1,14 +1,14 @@
 <?php
 session_start();
 if(!isset($_SESSION['passagier'])){
-  $melding = 'Log eerst in voordat u deze pagina bezoekt!';
-  header("location:home.php");
+  header("location:home.php?melding=Log eerst in voordat u deze pagina bezoekt.");
   die;
 }
 require_once 'db_connectie.php';
-require_once 'components/header.php';
+require_once 'components/functions.php';
+require_once 'components/head.php';
 require_once 'components/footer.php';
-require_once 'components/navigation.php';
+require_once 'components/header.php';
 
 $db = maakVerbinding();
 $query = 'SELECT V.vluchtnummer, balienummer, gatecode, stoel, max_gewicht_pp, bestemming, maatschappijcode, vertrektijd
@@ -27,12 +27,12 @@ while ($rij = $data->fetch()) {
   $balienummer = $rij['balienummer'];
   $gatecode = $rij['gatecode'];
   $stoel = $rij['stoel'];
-  $maxGewicht = $rij['max_gewicht_pp'];
+  $maxGewichtPp = $rij['max_gewicht_pp'];
   $bestemming = $rij['bestemming'];
   $maatschappijcode = $rij['maatschappijcode'];
   $vertrektijd = $rij['vertrektijd'];
 
-  $html_table .= "<tr><th>$vluchtnummer</th><th>$balienummer</th><th>$gatecode</th><th>$stoel</th><th>$maxGewicht kg</th><th>$bestemming</th><th>$maatschappijcode</th><th>$vertrektijd</th></tr>";
+  $html_table .= "<tr><th>$vluchtnummer</th><th>$balienummer</th><th>$gatecode</th><th>$stoel</th><th>$maxGewichtPp kg</th><th>$bestemming</th><th>$maatschappijcode</th><th>$vertrektijd</th></tr>";
 }
 
 $html_table .= "</table>";
@@ -43,7 +43,7 @@ echo genereerHead();
   <header class="container">
     <div class="header">
       <h1>Uw vluchtgegevens</h1>
-      <a href="logout.php">Log uit</a>
+      <?php checkInOfUitgelogd()?>
     </div>
     <h2>Passagier <?= $_SESSION['passagier']?></h2>
   </header>

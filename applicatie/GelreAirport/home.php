@@ -1,15 +1,17 @@
 <?php
 require_once 'db_connectie.php';
-require_once 'components/header.php';
+require_once 'components/functions.php';
+require_once 'components/head.php';
 require_once 'components/footer.php';
-require_once 'components/navigation.php';
-
+require_once 'components/header.php';
+session_start();
 $melding = '';
 
 $db = maakVerbinding();
 
 $query = 'SELECT TOP 5 vluchtnummer, bestemming, vertrektijd, maatschappijcode
           FROM Vlucht
+          WHERE vertrektijd > CURRENT_TIMESTAMP
           ORDER BY vertrektijd ASC';
 
 $data = $db->query($query);
@@ -17,25 +19,27 @@ $data = $db->query($query);
 $html_table = '<table>';
 $html_table = $html_table . '<tr><th>Vluchtnummer</th><th>Bestemming</th><th>Vertrektijd</th><th>Maatschappijcode</th></tr>';
 
-while($rij = $data->fetch()) {
+while ($rij = $data->fetch()) {
   $vluchtnummer = $rij['vluchtnummer'];
   $bestemming = $rij['bestemming'];
   $vertrektijd = $rij['vertrektijd'];
   $maatschappijcode = $rij['maatschappijcode'];
-  
+
   $html_table = $html_table . "<tr><th>$vluchtnummer</th><th>$bestemming</th><th>$vertrektijd</th><th>$maatschappijcode</th></tr>";
 }
 
 $html_table = $html_table . "</table>";
 echo genereerHead();
 ?>
+
 <body>
-<?= genereerNav();?>
+  <?= genereerNav(); ?>
   <header class="container">
     <div class="header">
       <h1>Home</h1>
-      <a href="login.php">Inloggen</a>
+      <?= checkInOfUitgelogd()?>
     </div>
+    <?=checkVoorMeldingen(); ?>
   </header>
   <main class="container">
     <a href="checkin.php" class="button">Ga naar de koffer check-in</a>
@@ -45,9 +49,9 @@ echo genereerHead();
         <a href="passengerInfo.php" class="button">Bekijk uw vluchtgegevens</a>
       </div>
       <div class="aankomendeVluchten">
-       <?php 
+        <?php
         echo ($html_table);
-       ?>
+        ?>
         <a href="flights.php" class="button">Bekijk alle toekomstige vluchten</a>
       </div>
       <?= $melding ?>
@@ -58,6 +62,7 @@ echo genereerHead();
       </div>
     </div>
   </main>
-  <?= genereerFooter();?>
+  <?= genereerFooter(); ?>
 </body>
+
 </html>

@@ -1,19 +1,20 @@
 <?php
 session_start();
 if(!isset($_SESSION['medewerker'])){
-  $melding = 'Log eerst in als medewerkervoordat u deze pagina bezoekt!';
-  header("location:home.php");
+  header("location:home.php?melding=Deze pagina is alleen zichtbaar voor medewerkers.");
   die;
 }
 require_once 'db_connectie.php';
-require_once 'components/header.php';
+require_once 'components/functions.php';
+require_once 'components/head.php';
 require_once 'components/footer.php';
-require_once 'components/navigation.php';
+require_once 'components/header.php';
 
 $db = maakVerbinding();
 
-$query = 'SELECT vluchtnummer, bestemming, gatecode, vertrektijd, maatschappijcode
-          FROM Vlucht';
+$query = 'SELECT vluchtnummer, bestemming, gatecode, vertrektijd, V.maatschappijcode, max_objecten_pp, max_gewicht_pp
+          FROM Vlucht V
+          INNER JOIN Maatschappij M ON V.maatschappijcode = M.maatschappijcode';
 
 $zoekVluchtnummer = isset($_POST['nummer']) ? $_POST['nummer'] : '';
 $filter = isset($_POST['filter']) ? $_POST['filter'] :'';
@@ -48,18 +49,20 @@ if (!empty($zoekVluchtnummer)) {
 $data->execute();
 
 $html_table = '<table>';
-$html_table .= '<tr><th>Vluchtnummer</th><th>Bestemming</th><th>Gatecode</th><th>Vertrektijd</th><th>Maatschappijcode</th></tr>';
+$html_table .= '<tr><th>Vluchtnummer</th><th>Bestemming</th><th>Gatecode</th><th>Vertrektijd</th><th>Maatschappijcode</th><th>Max. bagage pp</th><th>Max. gewicht pp</th></tr>';
 
 while ($rij = $data->fetch()) {
   $vluchtnummer = $rij['vluchtnummer'];
   $bestemming = $rij['bestemming'];
   $gatecode = $rij['gatecode'];
-  $vertrektijd = $rij['vertrektijd'];
+  $vertrektijd = date('d M Y', strtotime($rij['vertrektijd']));
   $maatschappijcode = $rij['maatschappijcode'];
+  $maxBagagePp = $rij['max_objecten_pp'];
+  $maxGewichtPp = round($rij['max_gewicht_pp'], 0);
 
   $passagiernummerLink = "<a href='allPassengers.php?vluchtnummer=$vluchtnummer'>$vluchtnummer</a>";
 
-  $html_table .= "<tr><th>$passagiernummerLink</th><th>$bestemming</th><th>$gatecode</th><th>$vertrektijd</th><th>$maatschappijcode</th></tr>";
+  $html_table .= "<tr><th>$passagiernummerLink</th><th>$bestemming</th><th>$gatecode</th><th>$vertrektijd</th><th>$maatschappijcode</th><th>$maxBagagePp</th><th>$maxGewichtPp kg</th></tr>";
 }
 
 $html_table .= "</table>";
@@ -70,7 +73,7 @@ echo genereerHead();
   <header class="container">
     <div class="header">
       <h1>Alle vluchten</h1>
-      <a href="logout.php">Log uit</a>
+      <?php checkInOfUitgelogd()?>
     </div>
   </header>
   <main class="container">

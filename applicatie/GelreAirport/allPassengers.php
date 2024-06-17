@@ -1,14 +1,14 @@
 <?php
 session_start();
 if(!isset($_SESSION['medewerker'])){
-  $melding = 'Log eerst in als medewerkervoordat u deze pagina bezoekt!';
-  header("location:home.php");
+  header("location:home.php?melding=Deze pagina is alleen zichtbaar voor medewerkers.");
   die;
 }
 require_once 'db_connectie.php';
-require_once 'components/header.php';
+require_once 'components/functions.php';
+require_once 'components/head.php';
 require_once 'components/footer.php';
-require_once 'components/navigation.php';
+require_once 'components/header.php';
 
 $vluchtnummer = isset($_GET['vluchtnummer']) ? $_GET['vluchtnummer'] : '';
 
@@ -88,7 +88,7 @@ echo genereerHead();
   <header class="container">
     <div class="header">
       <h1>Alle passagiers</h1>
-      <a href="logout.php">Log uit</a>
+      <?php checkInOfUitgelogd()?>
     </div>
   </header>
   <main class="container">

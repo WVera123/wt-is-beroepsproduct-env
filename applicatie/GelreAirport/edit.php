@@ -7,9 +7,10 @@ if(!$_SESSION['medewerker']){
 }
 
 require_once 'db_connectie.php';
-require_once 'components/header.php';
+require_once 'components/functions.php';
+require_once 'components/head.php';
 require_once 'components/footer.php';
-require_once 'components/navigation.php';
+require_once 'components/header.php';
 
 $melding = '';
 
@@ -74,7 +75,7 @@ echo genereerHead();
     <header class="container">
         <div class="header">
             <h1>Edit Passenger Information</h1>
-            <a href="logout.php">Log uit</a>
+            <?php checkInOfUitgelogd()?>
         </div>
     </header>
     <main class="container">

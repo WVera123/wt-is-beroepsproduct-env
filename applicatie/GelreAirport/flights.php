@@ -1,9 +1,10 @@
 <?php
 
 require_once 'db_connectie.php';
-require_once 'components/header.php';
+require_once 'components/functions.php';
+require_once 'components/head.php';
 require_once 'components/footer.php';
-require_once 'components/navigation.php';
+require_once 'components/header.php';
 
 $db = maakVerbinding();
 
@@ -47,8 +48,8 @@ echo genereerHead();
 <?= genereerNav();?>
   <header class="container">
     <div class="header">
-      <h1>Home</h1>
-      <a href="login.php">Inloggen</a>
+      <h1>Toekomstige vluchten</h1>
+      <?php checkInOfUitgelogd()?>
     </div>
   </header>
   <main class="container">
