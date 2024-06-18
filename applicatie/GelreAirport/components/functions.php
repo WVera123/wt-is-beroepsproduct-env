@@ -18,6 +18,8 @@ function checkVoorMeldingen()
 
 function genereerTabel($data, $kolommen)
 {
+  //https://www.tutorialrepublic.com/faq/how-to-get-current-page-url-in-php.php
+  $huidigePagina = $_SERVER['PHP_SELF'];
   $htmlTabel = '<table>';
 
   $htmlTabel .= '<tr>';
@@ -26,7 +28,7 @@ function genereerTabel($data, $kolommen)
     if ($kolom == 'max_objecten_pp') {
       $kolom = 'Max objecten pp';
     } else if ($kolom == 'max_gewicht_pp') {
-      $kolom = 'Max gewicht pp';
+      $kolom = 'Max kg pp';
     }
     $htmlTabel .= '<th>' . ucfirst($kolom) . '</th>';
   }
@@ -40,7 +42,14 @@ function genereerTabel($data, $kolommen)
           $datetime = new DateTime($rij[$kolom]);
           $formattedDateTime = $datetime->format('d-M-Y H:i');
           $htmlTabel .= '<td>' . $formattedDateTime . '</td>';
-        } else {
+        }else if($kolom == 'passagiernummer'){
+          $editPassagierLink = "<a href='edit.php?passagiernummer=$rij[$kolom]'>$rij[$kolom]</a>";
+          $htmlTabel .= '<td>' . $editPassagierLink . '</td>';
+        }else if($kolom == 'vluchtnummer' && $huidigePagina == '/GelreAirport/allFlights.php'){
+          $passagierLink = "<a href='allPassengers.php?vluchtnummer=$rij[$kolom]'>$rij[$kolom]</a>";
+          $htmlTabel .= '<td>' . $passagierLink . '</td>';
+        } 
+        else {
           $htmlTabel .= '<td>' . $rij[$kolom] . '</td>';
         }
       } else {
@@ -53,6 +62,31 @@ function genereerTabel($data, $kolommen)
   $htmlTabel .= '</table>';
 
   return $htmlTabel;
+}
+
+function bepaalBagageType($objectType, $quantityField, $weightField) {
+  $bagageObjecten = [];
+  $totaleGewicht = 0;
+  if (isset($_POST[$objectType])) {
+    $quantity = $_POST[$quantityField];
+    $weight = $_POST[$weightField];
+    for ($i = 0; $i < $quantity; $i++) {
+      $individualWeight = $weight / $quantity;
+      $bagageObjecten[] = $individualWeight;
+      $totaleGewicht += $individualWeight;
+    }
+  }
+  return [$bagageObjecten, $totaleGewicht];
+}
+
+function checkBestaanKolom($db, $tabelnaam, $kolomnaam, $waarde) {
+  $query = "SELECT COUNT(*) AS aantal 
+            FROM $tabelnaam 
+            WHERE $kolomnaam = :value";
+  $data = $db->prepare($query);
+  $data->execute([':value' => $waarde]);
+  $resultaat = $data->fetch(PDO::FETCH_ASSOC);
+  return $resultaat['aantal'] > 0;
 }
 
 function selecteerMaatschappij($db)

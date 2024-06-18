@@ -20,34 +20,15 @@ if (isset($_POST['verzend'])) {
   } else {
     $totaleGewicht = 0;
     $passagiernummer = $_POST['passagiernummer'];
-    $gewicht = 0;
     $bagageObjecten = [];
-    if (isset($_POST['objectKoffer'])) {
-      $aantalKoffer = $_POST['hoeveelheidKoffer'];
-      for ($i = 0; $i < $aantalKoffer; $i++) {
-        $gewichtKoffer = $_POST['gewichtKoffer'] / $aantalKoffer; //Zorgt ervoor dat als er verschillende koffers worden ingecheckt voor elk object het gemiddelde gewicht wordt genomen.
-        $bagageObjecten[] = $gewichtKoffer;
-        $totaleGewicht += $gewichtKoffer;
-      }
-    }
+    //Gebruik van list(), omdat het efficiënt bagage objecten met het verbonden gewicht aan variabelen toewijst.
+    list($kofferObjecten, $gewichtKoffer) = bepaalBagageType('objectKoffer', 'hoeveelheidKoffer', 'gewichtKoffer');
+    list($handbagageObjecten, $gewichtHandbagage) = bepaalBagageType('objectHandbagage', 'hoeveelheidHandbagage', 'gewichtHandbagage');
+    list($rugzakObjecten, $gewichtRugzak) = bepaalBagageType('objectRugzak', 'hoeveelheidRugzak', 'gewichtRugzak');
 
-    if (isset($_POST['objectHandbagage'])) {
-      $aantalHandbagage = $_POST['hoeveelheidHandbagage'];
-      for ($i = 0; $i < $aantalHandbagage; $i++) {
-        $gewichtHandbagage = $_POST['gewichtHandbagage'] / $aantalHandbagage;
-        $bagageObjecten[] = $gewichtHandbagage;
-        $totaleGewicht += $gewichtHandbagage;
-      }
-    }
-
-    if (isset($_POST['objectRugzak'])) {
-      $aantalRugzak = $_POST['hoeveelheidRugzak'];
-      for ($i = 0; $i < $aantalRugzak; $i++) {
-        $gewichtRugzak = $_POST['gewichtRugzak'] / $aantalRugzak;
-        $bagageObjecten[] = $gewichtRugzak;
-        $totaleGewicht += $gewichtRugzak;
-      }
-    }
+    //Voegt de arrays samen.
+    $bagageObjecten = array_merge($bagageObjecten, $kofferObjecten, $handbagageObjecten, $rugzakObjecten);
+    $totaleGewicht += $gewichtKoffer + $gewichtHandbagage + $gewichtRugzak;
 
     if (count($fouten) > 0) {
       $melding = "Er waren fouten in de invoer.<ul>";
@@ -57,86 +38,97 @@ if (isset($_POST['verzend'])) {
       $melding .= "</ul>";
     } else {
       $db = maakVerbinding();
-      //Query om huidige hoogste objectnummer te krijgen.
-      $sqlObjectnummer = 'SELECT MAX(objectvolgnummer) AS huidigNummer
+
+      // Check of passagiernummer bestaat
+      $queryCheckPassagierNum = "SELECT COUNT(*) AS count 
+                            FROM Passagier 
+                            WHERE passagiernummer = :passagiernummer";
+      $dataCheckPassagierNum = $db->prepare($queryCheckPassagierNum);
+      $dataCheckPassagierNum->execute([':passagiernummer' => $passagiernummer]);
+      $resultPassagiernummer = $dataCheckPassagierNum->fetch(PDO::FETCH_ASSOC);
+
+      if (!checkBestaanKolom($db, 'Passagier', 'passagiernummer', $passagiernummer)) {
+        $melding = 'Deze passagier bestaat niet.';
+      } else {
+
+        //Query om huidige hoogste objectnummer te krijgen.
+        $sqlObjectnummer = 'SELECT MAX(objectvolgnummer) AS huidigNummer
                           FROM BagageObject
                           WHERE passagiernummer =  ' . $passagiernummer;
-      $queryObjectnummer = $db->prepare($sqlObjectnummer);
+        $queryObjectnummer = $db->prepare($sqlObjectnummer);
 
-      $queryObjectnummer->execute();
+        $queryObjectnummer->execute();
 
-      $resultaatObjectnummer = $queryObjectnummer->fetch();
-      $objectvolgnummer = $resultaatObjectnummer['huidigNummer'];
+        $resultaatObjectnummer = $queryObjectnummer->fetch();
+        $objectvolgnummer = $resultaatObjectnummer['huidigNummer'] ?? -1;
 
-      $objectvolgnummer = $resultaatObjectnummer['huidigNummer'];
+        if ($objectvolgnummer == NULL) {
+          $objectvolgnummer = -1; // Initialiseer naar -1 zodat als er 1 bij op wordt geteld het resultaat 0 is.
+        }
 
-      if ($objectvolgnummer == NULL) {
-        $objectvolgnummer = -1; // Initialiseer naar -1 zodat als er 1 bij op wordt geteld het resultaat 0 is.
-      }
-
-      //Query om huidige incheckte gewicht te krijgen.
-      $sqlGewicht = 'SELECT SUM(gewicht) AS huidigGewicht
+        //Query om huidige incheckte gewicht te krijgen.
+        $sqlGewicht = 'SELECT SUM(gewicht) AS huidigGewicht
                      FROM BagageObject
                      WHERE passagiernummer =  ' . $passagiernummer;
-      $queryGewicht = $db->prepare($sqlGewicht);
+        $queryGewicht = $db->prepare($sqlGewicht);
 
-      $queryGewicht->execute();
+        $queryGewicht->execute();
 
-      $resultaatGewicht = $queryGewicht->fetch();
-      $totaleGewicht += $resultaatGewicht['huidigGewicht'];
+        $resultaatGewicht = $queryGewicht->fetch();
+        $totaleGewicht += $resultaatGewicht['huidigGewicht'];
 
-      //Query om maximale objecten en maximale gewichten te krigjen.
-      $sqlMax = 'SELECT max_objecten_pp, max_aantal, max_gewicht_pp , max_totaalgewicht
+        //Query om maximale objecten en maximale gewichten te krigjen.
+        $sqlMax = 'SELECT max_objecten_pp, max_gewicht_pp , max_totaalgewicht
                   FROM Maatschappij M
                   INNER JOIN Vlucht V ON M.maatschappijcode = V.maatschappijcode
                   INNER JOIN Passagier P ON V.vluchtnummer = P.vluchtnummer
                   WHERE P.passagiernummer = ' . $passagiernummer;
 
-      $queryMax = $db->prepare($sqlMax);
+        $queryMax = $db->prepare($sqlMax);
 
-      $queryMax->execute();
+        $queryMax->execute();
 
-      $resultaatMax = $queryMax->fetch();
-      $maxObjecten = $resultaatMax['max_objecten_pp'];
-      $maxPassagiers = $resultaatMax['max_aantal'];
-      $maxGewichtPp = $resultaatMax['max_gewicht_pp'];
-      $maxGewicht = $resultaatMax['max_totaalgewicht'];
+        $resultaatMax = $queryMax->fetch();
 
-      if (($objectvolgnummer + 1) + count($bagageObjecten) > $maxObjecten) {
-        $fouten[] = "U heeft uw bagage limiet overschreden. De limiet is $maxObjecten. ";
-      }
+        $maxObjecten = $resultaatMax['max_objecten_pp'];
+        $maxGewichtPp = $resultaatMax['max_gewicht_pp'];
 
-      if ($totaleGewicht > $maxGewichtPp) {
-        $fouten[] = "Uw bagage is te zwaar. De totale limiet is $maxGewichtPp kg.";
-      }
-
-      if (count($fouten) > 0) {
-        $melding = "Er waren fouten in de invoer.<ul>";
-        foreach ($fouten as $fout) {
-          $melding .= "<li>$fout</li>";
+        if (($objectvolgnummer + 1) + count($bagageObjecten) > $maxObjecten) {
+          $fouten[] = "U heeft uw bagage limiet overschreden. De limiet is $maxObjecten. ";
         }
-        $melding .= "</ul>";
-      } else {
-        foreach ($bagageObjecten as $bagageObject) {
+
+        if ($totaleGewicht > $maxGewichtPp) {
+          $fouten[] = "Uw bagage is te zwaar. De totale limiet is $maxGewichtPp kg.";
+        }
+
+        if (count($fouten) > 0) {
+          $melding = "Er waren fouten in de invoer.<ul>";
+          foreach ($fouten as $fout) {
+            $melding .= "<li>$fout</li>";
+          }
+          $melding .= "</ul>";
+        } else {
+          foreach ($bagageObjecten as $bagageObject) {
             $objectvolgnummer += 1;
-          $sqlInsert = 'INSERT INTO BagageObject (passagiernummer, objectvolgnummer, gewicht) 
+            $sqlInsert = 'INSERT INTO BagageObject (passagiernummer, objectvolgnummer, gewicht) 
                         VALUES (:passagiernummer, :objectvolgnummer, :gewicht)';
 
-          $queryInsert = $db->prepare($sqlInsert);
+            $queryInsert = $db->prepare($sqlInsert);
 
-          $data_array = [
-            ':passagiernummer' => $passagiernummer,
-            ':objectvolgnummer' => $objectvolgnummer,
-            ':gewicht' => $bagageObject,
-          ];
+            $data_array = [
+              ':passagiernummer' => $passagiernummer,
+              ':objectvolgnummer' => $objectvolgnummer,
+              ':gewicht' => $bagageObject,
+            ];
 
-          $success = $queryInsert->execute($data_array);
-        }
+            $success = $queryInsert->execute($data_array);
+          }
 
-        if ($success) {
-          $melding = 'Bagage is ingecheckt.';
-        } else {
-          $melding = 'Bagage inchecken is mislukt.';
+          if ($success) {
+            $melding = 'Bagage is ingecheckt.';
+          } else {
+            $melding = 'Bagage inchecken is mislukt.';
+          }
         }
       }
     }

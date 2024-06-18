@@ -44,31 +44,15 @@ while ($rij = $data->fetch()) {
 if (isset($_POST['update'])) {
 
     $updatedPassagiernummer = $_POST['passagiernummer'];
-    $updatedVluchtnummer = $_POST['vluchtnummer'];
+    $updatedPassagiernummer = $_POST['vluchtnummer'];
     $updatedBalienummer = $_POST['balienummer'];
     $updatedStoelnummer = $_POST['stoel'];
 
-    // Check of vluchtnummernummer bestaat
-    $queryCheckVluchtNum = "SELECT COUNT(*) AS count 
-                            FROM Vlucht 
-                            WHERE vluchtnummer = :vluchtnummer";
-    $dataCheckVluchtNum = $db->prepare($queryCheckVluchtNum);
-    $dataCheckVluchtNum->execute([':vluchtnummer' => $updatedVluchtnummer]);
-    $resultVluchtnummer = $dataCheckVluchtNum->fetch(PDO::FETCH_ASSOC);
-
-    if ($resultVluchtnummer['count'] <= 0) {
+    if (!checkBestaanKolom($db, 'Vlucht', 'vluchtnummer', $updatedPassagiernummer)) {
         $fouten[] = 'Deze vlucht bestaat niet.';
     }
 
-    // Check of stoel is bezet
-    $queryCheckStoel = "SELECT COUNT(*) AS count 
-                        FROM Passagier 
-                        WHERE stoel = :stoel AND vluchtnummer = :vluchtnummer";
-    $dataCheckStoel = $db->prepare($queryCheckStoel);
-    $dataCheckStoel->execute([':stoel' => $updatedStoelnummer, ':vluchtnummer' => $updatedVluchtnummer]);
-    $resultStoel = $dataCheckStoel->fetch(PDO::FETCH_ASSOC);
-
-    if ($resultStoel['count'] > 0) {
+    if (!checkBestaanKolom($db, 'Passagier', 'stoel', $updatedPassagiernummer)) {
         $fouten[] = 'Deze stoel is al bezet.';
     }
 
@@ -85,7 +69,7 @@ if (isset($_POST['update'])) {
                         WHERE passagiernummer = :passagiernummer';
 
         $updateData = $db->prepare($updateQuery);
-        $updateData->bindParam(':vluchtnummer', $updatedVluchtnummer);
+        $updateData->bindParam(':vluchtnummer', $updatedPassagiernummer);
         $updateData->bindParam(':balienummer', $updatedBalienummer);
         $updateData->bindParam(':stoel', $updatedStoelnummer);
         if (!empty($updatedPassagiernummer)) {

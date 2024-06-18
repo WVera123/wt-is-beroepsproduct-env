@@ -40,14 +40,14 @@ if (isset($_POST['nieuwePassagier'])) {
   }
 
   // Check of vluchtnummernummer bestaat
-  $queryCheckVluchtNum = "SELECT COUNT(*) AS count 
+  $queryCheckPassagierNum = "SELECT COUNT(*) AS count 
                           FROM Vlucht 
                           WHERE vluchtnummer = :vluchtnummer";
-  $dataCheckVluchtNum = $db->prepare($queryCheckVluchtNum);
+  $dataCheckVluchtNum = $db->prepare($queryCheckPassagierNum);
   $dataCheckVluchtNum->execute([':vluchtnummer' => $vluchtnummer]);
-  $resultVluchtnummer = $dataCheckVluchtNum->fetch(PDO::FETCH_ASSOC);
+  $resultPassagiernummer = $dataCheckVluchtNum->fetch(PDO::FETCH_ASSOC);
 
-  if ($resultVluchtnummer['count'] <= 0) {
+  if ($resultPassagiernummer['count'] <= 0) {
     $fouten[] = 'Deze vlucht bestaat niet.';
   }
 
@@ -150,14 +150,14 @@ if (isset($_POST['nieuweVlucht'])) {
   $maatschappijcode = $_POST['maatschappijcode'];
 
   // Check of passagiernummer al bestaat
-  $queryCheckVluchtNum = "SELECT COUNT(*) AS count 
+  $queryCheckPassagierNum = "SELECT COUNT(*) AS count 
                           FROM Vlucht 
                           WHERE vluchtnummer = :vluchtnummer";
-  $dataCheckVluchtNum = $db->prepare($queryCheckVluchtNum);
+  $dataCheckVluchtNum = $db->prepare($queryCheckPassagierNum);
   $dataCheckVluchtNum->execute([':vluchtnummer' => $vluchtnummer]);
-  $resultVluchtnummer = $dataCheckVluchtNum->fetch(PDO::FETCH_ASSOC);
+  $resultPassagiernummer = $dataCheckVluchtNum->fetch(PDO::FETCH_ASSOC);
 
-  if ($resultVluchtnummer['count'] > 0) {
+  if ($resultPassagiernummer['count'] > 0) {
     $fouten[] = 'Dit vluchtnummer is al in gebruik.';
   }
 
