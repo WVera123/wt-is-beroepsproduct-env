@@ -47,25 +47,8 @@ if (!empty($zoekVluchtnummer)) {
 }
 
 $data->execute();
+$kolommen = ['vluchtnummer', 'bestemming', 'gatecode', 'vertrektijd', 'maatschappijcode', 'max_objecten_pp', 'max_gewicht_pp'];
 
-$html_table = '<table>';
-$html_table .= '<tr><th>Vluchtnummer</th><th>Bestemming</th><th>Gatecode</th><th>Vertrektijd</th><th>Maatschappijcode</th><th>Max. bagage pp</th><th>Max. gewicht pp</th></tr>';
-
-while ($rij = $data->fetch()) {
-  $vluchtnummer = $rij['vluchtnummer'];
-  $bestemming = $rij['bestemming'];
-  $gatecode = $rij['gatecode'];
-  $vertrektijd = date('d M Y', strtotime($rij['vertrektijd']));
-  $maatschappijcode = $rij['maatschappijcode'];
-  $maxBagagePp = $rij['max_objecten_pp'];
-  $maxGewichtPp = round($rij['max_gewicht_pp'], 0);
-
-  $passagiernummerLink = "<a href='allPassengers.php?vluchtnummer=$vluchtnummer'>$vluchtnummer</a>";
-
-  $html_table .= "<tr><th>$passagiernummerLink</th><th>$bestemming</th><th>$gatecode</th><th>$vertrektijd</th><th>$maatschappijcode</th><th>$maxBagagePp</th><th>$maxGewichtPp kg</th></tr>";
-}
-
-$html_table .= "</table>";
 echo genereerHead();
 ?>
 <body>
@@ -95,9 +78,7 @@ echo genereerHead();
           </div>
         </form>
       </div>
-      <?php
-      echo ($html_table);
-      ?>
+      <?=genereerTabel($data, $kolommen) ?>
     </div>
   </main>
   <?= genereerFooter();?>

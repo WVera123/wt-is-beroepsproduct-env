@@ -1,20 +1,62 @@
 <?php
-function checkInOfUitgelogd(){
-  if (isset($_SESSION['passagier']) || isset($_SESSION['medewerker'])){
+function checkInOfUitgelogd()
+{
+  if (isset($_SESSION['passagier']) || isset($_SESSION['medewerker'])) {
     echo "<a href='logout.php'>Log uit</a>";
-  }else{
+  } else {
     echo "<a href='login.php'>Inloggen</a>";
   }
 }
 
-function checkVoorMeldingen(){
-  if (isset($_GET['melding'])){
+function checkVoorMeldingen()
+{
+  if (isset($_GET['melding'])) {
     $melding = $_GET['melding'];
     echo "$melding";
   }
 }
 
-function selecteerMaatschappij($db){
+function genereerTabel($data, $kolommen)
+{
+  $htmlTabel = '<table>';
+
+  $htmlTabel .= '<tr>';
+  foreach ($kolommen as $kolom) {
+    //Changes display name
+    if ($kolom == 'max_objecten_pp') {
+      $kolom = 'Max objecten pp';
+    } else if ($kolom == 'max_gewicht_pp') {
+      $kolom = 'Max gewicht pp';
+    }
+    $htmlTabel .= '<th>' . ucfirst($kolom) . '</th>';
+  }
+  $htmlTabel .= '</tr>';
+
+  while ($rij = $data->fetch()) {
+    $htmlTabel .= '<tr>';
+    foreach ($kolommen as $kolom) {
+      if (isset($rij[$kolom])) {
+        if ($kolom == 'vertrektijd' || $kolom == 'inchecktijdstip') {
+          $datetime = new DateTime($rij[$kolom]);
+          $formattedDateTime = $datetime->format('d-M-Y H:i');
+          $htmlTabel .= '<td>' . $formattedDateTime . '</td>';
+        } else {
+          $htmlTabel .= '<td>' . $rij[$kolom] . '</td>';
+        }
+      } else {
+        $htmlTabel .= '<td>' . '-' . '</td>';
+      }
+    }
+    $htmlTabel .= '</tr>';
+  }
+
+  $htmlTabel .= '</table>';
+
+  return $htmlTabel;
+}
+
+function selecteerMaatschappij($db)
+{
   $db = maakVerbinding();
 
   $query = "SELECT maatschappijcode
@@ -23,13 +65,14 @@ function selecteerMaatschappij($db){
   $maatschappijen->execute();
   $maatschappijen = $maatschappijen->fetchAll();
 
-  foreach($maatschappijen as $maatschappij){
+  foreach ($maatschappijen as $maatschappij) {
     $maatschappijCode = $maatschappij['maatschappijcode'];
     echo "<option value='$maatschappijCode'>$maatschappijCode</option>";
   }
 }
 
-function selecteerGate($db){
+function selecteerGate($db)
+{
   $db = maakVerbinding();
 
   $query = "SELECT gatecode
@@ -38,13 +81,14 @@ function selecteerGate($db){
   $gates->execute();
   $gates = $gates->fetchAll();
 
-  foreach($gates as $gate){
+  foreach ($gates as $gate) {
     $gatecode = $gate['gatecode'];
     echo "<option value='$gatecode'>$gatecode</option>";
   }
 }
 
-function selecteerBalie($db){
+function selecteerBalie($db)
+{
   $db = maakVerbinding();
 
   $query = "SELECT balienummer
@@ -53,7 +97,7 @@ function selecteerBalie($db){
   $balies->execute();
   $balies = $balies->fetchAll();
 
-  foreach($balies as $balie){
+  foreach ($balies as $balie) {
     $balienummer = $balie['balienummer'];
     echo "<option value='$balienummer'>$balienummer</option>";
   }

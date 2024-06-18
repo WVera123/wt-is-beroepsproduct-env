@@ -63,24 +63,7 @@ if (!empty($zoekPassagiernummer)) {
 
 $data->execute();
 
-$html_table = '<table>';
-$html_table .= '<tr><th>Passagiernummer</th><th>Naam</th><th>Vluchtnummer</th><th>Balienummer</th><th>Stoelnummer</th><th>Inchecktijdstip</th></tr>';
-
-while ($rij = $data->fetch()) {
-  $passagiernummer = $rij['passagiernummer'];
-  $naam = $rij['naam'];
-  $vluchtnummer = $rij['vluchtnummer'];
-  $balienummer = $rij['balienummer'];
-  $stoel = $rij['stoel'];
-  $inchecktijdstip = $rij['inchecktijdstip'];
-
-  $editpassagierLink = "<a href='edit.php?passagiernummer=$passagiernummer'>$passagiernummer</a>";
-
-  $html_table .= "<tr><th>$editpassagierLink</th><th>$naam</th><th>$vluchtnummer</th><th>$balienummer</th><th>$stoel</th><th>$inchecktijdstip</th></tr>";
-
-}
-
-$html_table .= "</table>";
+$kolommen = ['passagiernummer', 'naam', 'vluchtnummer', 'balienummer', 'stoel', 'inchecktijdstip'];
 echo genereerHead();
 ?>
 <body>
@@ -113,7 +96,7 @@ echo genereerHead();
           </div>
         </form>
       </div>
-      <?php echo ($html_table); ?>
+      <?= genereerTabel($data, $kolommen); ?>
     </div>
   </main>
   <?= genereerFooter();?>

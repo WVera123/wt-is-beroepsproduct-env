@@ -19,23 +19,7 @@ $data = $db->prepare($query);
 
 $data->execute();
 
-$html_table = '<table>';
-$html_table .= '<tr><th>Vluchtnummer</th><th>Balienummer</th><th>Gatecode</th><th>Stoel</th><th>Max. gewicht pp</th><th>Bestemming</th><th>Maatschappijcode</th><th>Vertrektijd</th></tr>';
-
-while ($rij = $data->fetch()) {
-  $vluchtnummer = $rij['vluchtnummer'];
-  $balienummer = $rij['balienummer'];
-  $gatecode = $rij['gatecode'];
-  $stoel = $rij['stoel'];
-  $maxGewichtPp = $rij['max_gewicht_pp'];
-  $bestemming = $rij['bestemming'];
-  $maatschappijcode = $rij['maatschappijcode'];
-  $vertrektijd = $rij['vertrektijd'];
-
-  $html_table .= "<tr><th>$vluchtnummer</th><th>$balienummer</th><th>$gatecode</th><th>$stoel</th><th>$maxGewichtPp kg</th><th>$bestemming</th><th>$maatschappijcode</th><th>$vertrektijd</th></tr>";
-}
-
-$html_table .= "</table>";
+$kolommen = ['vluchtnummer', 'balienummer', 'gatecode', 'stoel', 'max_gewicht_pp', 'bestemming', 'maatschappijcode', 'vertrektijd'];
 echo genereerHead();
 ?>
 <body>
@@ -48,9 +32,7 @@ echo genereerHead();
     <h2>Passagier <?= $_SESSION['passagier']?></h2>
   </header>
   <main class="container">
-  <?php 
-    echo ($html_table);
-  ?>
+  <?= genereerTabel($data, $kolommen); ?>
   </main>
   <?= genereerFooter();?>
 </body>

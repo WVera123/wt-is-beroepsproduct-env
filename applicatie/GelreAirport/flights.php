@@ -28,20 +28,7 @@ if (!empty($zoekVluchtnummer)) {
 
 $data->execute();
 
-$html_table = '<table>';
-$html_table .= '<tr><th>Vluchtnummer</th><th>Bestemming</th><th>Gatecode</th><th>Vertrektijd</th><th>Maatschappijcode</th></tr>';
-
-while ($rij = $data->fetch()) {
-  $vluchtnummer = $rij['vluchtnummer'];
-  $bestemming = $rij['bestemming'];
-  $gatecode = $rij['gatecode'];
-  $vertrektijd = $rij['vertrektijd'];
-  $maatschappijcode = $rij['maatschappijcode'];
-
-  $html_table .= "<tr><th>$vluchtnummer</th><th>$bestemming</th><th>$gatecode</th><th>$vertrektijd</th><th>$maatschappijcode</th></tr>";
-}
-
-$html_table .= "</table>";
+$kolommen = ['vluchtnummer', 'bestemming', 'gatecode', 'vertrektijd', 'maatschappijcode'];
 echo genereerHead();
 ?>
 <body>
@@ -61,9 +48,7 @@ echo genereerHead();
           <button type="submit" name="zoek"><i class="fa fa-search"></i></button>
         </form>
       </div>
-      <?php 
-        echo ($html_table);
-       ?>
+      <?= genereerTabel($data, $kolommen); ?>
     </div>
   </main>
   <?= genereerFooter();?>

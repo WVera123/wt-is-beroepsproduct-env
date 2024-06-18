@@ -14,21 +14,10 @@ $query = 'SELECT TOP 5 vluchtnummer, bestemming, vertrektijd, maatschappijcode
           WHERE vertrektijd > CURRENT_TIMESTAMP
           ORDER BY vertrektijd ASC';
 
-$data = $db->query($query);
+$data = $db->prepare($query);
 
-$html_table = '<table>';
-$html_table = $html_table . '<tr><th>Vluchtnummer</th><th>Bestemming</th><th>Vertrektijd</th><th>Maatschappijcode</th></tr>';
-
-while ($rij = $data->fetch()) {
-  $vluchtnummer = $rij['vluchtnummer'];
-  $bestemming = $rij['bestemming'];
-  $vertrektijd = $rij['vertrektijd'];
-  $maatschappijcode = $rij['maatschappijcode'];
-
-  $html_table = $html_table . "<tr><th>$vluchtnummer</th><th>$bestemming</th><th>$vertrektijd</th><th>$maatschappijcode</th></tr>";
-}
-
-$html_table = $html_table . "</table>";
+$data->execute();
+$kolommen = ['vluchtnummer', 'bestemming', 'vertrektijd', 'maatschappijcode'];
 echo genereerHead();
 ?>
 
@@ -49,9 +38,7 @@ echo genereerHead();
         <a href="passengerInfo.php" class="button">Bekijk uw vluchtgegevens</a>
       </div>
       <div class="aankomendeVluchten">
-        <?php
-        echo ($html_table);
-        ?>
+        <?= genereerTabel($data, $kolommen); ?>
         <a href="flights.php" class="button">Bekijk alle toekomstige vluchten</a>
       </div>
       <?= $melding ?>
