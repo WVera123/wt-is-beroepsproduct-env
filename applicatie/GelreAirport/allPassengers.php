@@ -16,7 +16,7 @@ $db = maakVerbinding();
 
 $query = 'SELECT passagiernummer, naam, vluchtnummer, balienummer, stoel, inchecktijdstip
           FROM Passagier
-          WHERE 1 = 1'; //IMPROVE THIS
+          WHERE passagiernummer IS NOT NULL';
 
 $zoekPassagiernummer = isset($_POST['nummer']) ? $_POST['nummer'] : '';
 $filter = isset($_POST['filter']) ? $_POST['filter'] :'';

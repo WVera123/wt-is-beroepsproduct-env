@@ -1,0 +1,2 @@
+improve multi-tier
+remove regiser.php

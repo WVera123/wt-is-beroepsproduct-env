@@ -54,10 +54,10 @@ if (isset($_POST['verzend'])) {
         //Query om huidige hoogste objectnummer te krijgen.
         $sqlObjectnummer = 'SELECT MAX(objectvolgnummer) AS huidigNummer
                           FROM BagageObject
-                          WHERE passagiernummer =  ' . $passagiernummer;
+                          WHERE passagiernummer =  :passagiernummer';
         $queryObjectnummer = $db->prepare($sqlObjectnummer);
 
-        $queryObjectnummer->execute();
+        $queryObjectnummer->execute([':passagiernummer' => $passagiernummer]);
 
         $resultaatObjectnummer = $queryObjectnummer->fetch();
         $objectvolgnummer = $resultaatObjectnummer['huidigNummer'] ?? -1;
@@ -69,10 +69,10 @@ if (isset($_POST['verzend'])) {
         //Query om huidige incheckte gewicht te krijgen.
         $sqlGewicht = 'SELECT SUM(gewicht) AS huidigGewicht
                      FROM BagageObject
-                     WHERE passagiernummer =  ' . $passagiernummer;
+                     WHERE passagiernummer =  :passagiernummer';
         $queryGewicht = $db->prepare($sqlGewicht);
 
-        $queryGewicht->execute();
+        $queryGewicht->execute([':passagiernummer' => $passagiernummer]);
 
         $resultaatGewicht = $queryGewicht->fetch();
         $totaleGewicht += $resultaatGewicht['huidigGewicht'];
@@ -82,11 +82,11 @@ if (isset($_POST['verzend'])) {
                   FROM Maatschappij M
                   INNER JOIN Vlucht V ON M.maatschappijcode = V.maatschappijcode
                   INNER JOIN Passagier P ON V.vluchtnummer = P.vluchtnummer
-                  WHERE P.passagiernummer = ' . $passagiernummer;
+                  WHERE P.passagiernummer = :passagiernummer';
 
         $queryMax = $db->prepare($sqlMax);
 
-        $queryMax->execute();
+        $queryMax->execute([':passagiernummer' => $passagiernummer]);
 
         $resultaatMax = $queryMax->fetch();
 
