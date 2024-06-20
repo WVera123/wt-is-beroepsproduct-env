@@ -132,7 +132,8 @@ function selecteerGate($db)
 
   foreach ($gates as $gate) {
     $gatecode = $gate['gatecode'];
-    echo "<option value='$gatecode'>$gatecode</option>";
+    $geselecteerd = (isset($_POST['gatecode']) && $_POST['gatecode'] == $gatecode) ? 'selected' : '';
+    echo "<option value='$gatecode' $geselecteerd>$gatecode</option>";
   }
 }
 
@@ -148,7 +149,8 @@ function selecteerBalie($db)
 
   foreach ($balies as $balie) {
     $balienummer = $balie['balienummer'];
-    echo "<option value='$balienummer'>$balienummer</option>";
+    $geselecteerd = (isset($_POST['balienummer']) && $_POST['balienummer'] == $balienummer) ? 'selected' : '';
+    echo "<option value='$balienummer' $geselecteerd>$balienummer</option>";
   }
 }
 

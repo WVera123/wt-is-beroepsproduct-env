@@ -128,9 +128,9 @@ if (isset($_POST['nieuwePassagier'])) {
       $succes = $query->execute($dataArray);
 
       if ($succes) {
-        $melding = 'Gebruiker is geregistreerd!';
+        $melding = 'Gebruiker is geregistreerd.';
       } else {
-        $melding = 'Registratie is mislukt!';
+        $melding = 'Registratie is mislukt.';
       }
     }
   }
@@ -205,9 +205,9 @@ if (isset($_POST['nieuweVlucht'])) {
     $succes = $query->execute($dataArray);
 
     if ($succes) {
-      $melding = 'Vlucht is toegevoegd!';
+      $melding = 'Vlucht is toegevoegd.';
     } else {
-      $melding = 'Vlucht toevoegen is mislukt!';
+      $melding = 'Vlucht toevoegen is mislukt.';
     }
   }
 }
@@ -229,20 +229,26 @@ echo genereerHead();
         <h2>Voer een nieuwe passagier in</h2>
         <div class="data">
           <label for="passagiernummer">Passagiernummer*:</label>
-          <input type="number" name="passagiernummer" id="passagiernummer" required>
+          <input type="number" name="passagiernummer" id="passagiernummer"
+            value="<?= isset($_POST['passagiernummer']) ? $_POST['passagiernummer'] : '' ?>" required>
 
           <label for="achternaam">Achternaam*:</label>
-          <input type="text" name="achternaam" id="achternaam" required>
+          <input type="text" name="achternaam" id="achternaam"
+            value="<?= isset($_POST['achternaam']) ? $_POST['achternaam'] : '' ?>" required>
 
           <label for="vluchtnummer">Vluchtnummer*:</label>
-          <input type="number" name="vluchtnummer" id="vluchtnummer" required>
+          <input type="number" name="vluchtnummer" id="vluchtnummer"
+            value="<?= isset($_POST['vluchtnummer']) ? $_POST['vluchtnummer'] : '' ?>" required>
 
           <label for="geslacht">Geslacht</label>
           <select name="geslacht" id="geslacht">
             <option value="null">Kies een geslacht</option>
-            <option value="V">V</option>
-            <option value="M">M</option>
-            <option value="x">x</option>
+            <option value="V" <?php echo (isset($_POST['geslacht']) && $_POST['geslacht'] == 'V') ? 'selected' : ''; ?>>V
+            </option>
+            <option value="M" <?php echo (isset($_POST['geslacht']) && $_POST['geslacht'] == 'M') ? 'selected' : ''; ?>>M
+            </option>
+            <option value="x" <?php echo (isset($_POST['geslacht']) && $_POST['geslacht'] == 'x') ? 'selected' : ''; ?>>x
+            </option>
           </select>
 
           <label for="balienummer">Balienummer:</label>
@@ -252,13 +258,15 @@ echo genereerHead();
           </select>
 
           <label for="stoel">Stoelnummer:</label>
-          <input type="text" name="stoel" id="stoel">
+          <input type="text" name="stoel" id="stoel" value="<?= isset($_POST['stoel']) ? $_POST['stoel'] : '' ?>">
 
           <label for="incheckdatum">Incheckdatum:</label>
-          <input type="date" name="incheckdatum" id="incheckdatum" value="">
+          <input type="date" name="incheckdatum" id="incheckdatum"
+            value="<?= isset($_POST['incheckdatum']) ? $_POST['incheckdatum'] : '' ?>">
 
           <label for="inchecktijdstip">Inchecktijdstip:</label>
-          <input type="time" name="inchecktijdstip" id="inchecktijdstip">
+          <input type="time" name="inchecktijdstip" id="inchecktijdstip"
+            value="<?= isset($_POST['inchecktijdstip']) ? $_POST['inchecktijdstip'] : '' ?>">
 
           <label for="wachtwoord">Wachtwoord:</label>
           <input type="password" id="wachtwoord" name="wachtwoord" required>
@@ -273,10 +281,10 @@ echo genereerHead();
         <h2>Voer een nieuwe vlucht in</h2>
         <div class="data">
           <label for="vluchtnummer">Vluchtnummer*:</label>
-          <input type="number" name="vluchtnummer" id="vluchtnummer" required>
+          <input type="number" name="vluchtnummer" id="vluchtnummer" value="<?= isset($_POST['vluchtnummer']) ? $_POST['vluchtnummer'] : '' ?>" required>
 
           <label for="bestemming">Bestemming*:</label>
-          <input type="text" name="bestemming" id="bestemming" required>
+          <input type="text" name="bestemming" id="bestemming" value="<?= isset($_POST['bestemming']) ? $_POST['bestemming'] : '' ?>" required>
 
           <label for="gatecode">Gatecode:</label>
           <select name="gatecode" id="gatecode">
@@ -285,22 +293,22 @@ echo genereerHead();
           </select>
 
           <label for="max_aantal">Max. aantal passagiers*:</label>
-          <input type="number" name="max_aantal" id="max_aantal" required>
+          <input type="number" name="max_aantal" id="max_aantal" value="<?= isset($_POST['max_aantal']) ? $_POST['max_aantal'] : '' ?>" required>
 
           <label for="max_gewichtpp">Max. gewicht p.p*:</label>
-          <input type="number" name="max_gewichtpp" id="max_gewichtpp" required>
+          <input type="number" name="max_gewichtpp" id="max_gewichtpp" value="<?= isset($_POST['max_gewichtpp']) ? $_POST['max_gewichtpp'] : '' ?>" required>
 
           <label for="max_totaalgewicht">Max. totaal gewicht*:</label>
-          <input type="number" name="max_totaalgewicht" id="max_totaalgewicht" required>
+          <input type="number" name="max_totaalgewicht" id="max_totaalgewicht" value="<?= isset($_POST['max_totaalgewicht']) ? $_POST['max_totaalgewicht'] : '' ?>" required>
 
           <label for="vertrekdatum">Vertrekdatum:</label>
-          <input type="date" name="vertrekdatum" id="vertrekdatum">
+          <input type="date" name="vertrekdatum" id="vertrekdatum" value="<?= isset($_POST['vertrekdatum']) ? $_POST['vertrekdatum'] : '' ?>">
 
           <label for="vertrektijd">Vertrektijd:</label>
-          <input type="time" name="vertrektijd" id="vertrektijd">
+          <input type="time" name="vertrektijd" id="vertrektijd" value="<?= isset($_POST['vertrektijd']) ? $_POST['vertrektijd'] : '' ?>">
 
           <label for="maatschappijcode">Maatschappijcode*:</label>
-          <select name="maatschappijcode" id="maatschappijcode" required>
+          <select name="maatschappijcode" id="maatschappijcode" value="<?= isset($_POST['maatschappijcode']) ? $_POST['maatschappijcode'] : '' ?>" required>
             <?= selecteerMaatschappij($db) ?>
           </select>
         </div>

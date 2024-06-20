@@ -58,8 +58,7 @@ echo genereerHead();
         <form action="allPassengers.php" method="POST">
           <div class="zoekbalk">
             <label for="zoek">Zoek een passagiernummer</label>
-            <input type="number" name="nummer" id="nummer" <?php if (isset($_POST['nummer'])): ?>
-                value="<?= $_POST['nummer'] ?>" <?php endif ?>>
+            <input type="number" name="nummer" id="nummer" <?php if (isset($_POST['nummer'])): ?>value="<?= $_POST['nummer'] ?>" <?php endif ?>>
             <button type="submit" name="zoek"><i class="fa fa-search"></i></button>
           </div>
         </form>
