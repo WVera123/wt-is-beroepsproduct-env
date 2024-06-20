@@ -43,16 +43,14 @@ while ($rij = $data->fetch()) {
 
 if (isset($_POST['update'])) {
 
-    $updatedPassagiernummer = $_POST['passagiernummer'];
-    $updatedPassagiernummer = $_POST['vluchtnummer'];
+    $updatedVluchtnummer = $_POST['vluchtnummer'];
     $updatedBalienummer = $_POST['balienummer'];
     $updatedStoelnummer = $_POST['stoel'];
-
-    if (!checkBestaanKolom($db, 'Vlucht', 'vluchtnummer', $updatedPassagiernummer)) {
+    if (!checkBestaanKolom($db, 'Vlucht', 'vluchtnummer', $updatedVluchtnummer)) {
         $fouten[] = 'Deze vlucht bestaat niet.';
     }
 
-    if (!checkBestaanKolom($db, 'Passagier', 'stoel', $updatedPassagiernummer)) {
+    if (checkBestaanKolom($db, 'Passagier', 'stoel', $updatedStoelnummer, 'vluchtnummer', $updatedVluchtnummer)) {
         $fouten[] = 'Deze stoel is al bezet.';
     }
 
@@ -69,16 +67,9 @@ if (isset($_POST['update'])) {
                         WHERE passagiernummer = :passagiernummer';
 
         $updateData = $db->prepare($updateQuery);
-        $updateData->bindParam(':vluchtnummer', $updatedPassagiernummer);
-        $updateData->bindParam(':balienummer', $updatedBalienummer);
-        $updateData->bindParam(':stoel', $updatedStoelnummer);
-        if (!empty($updatedPassagiernummer)) {
-            $updateData->bindParam(':passagiernummer', $updatedPassagiernummer);
-        }
-        $updateData->execute();
+        $updateData->execute([':vluchtnummer' => $updatedVluchtnummer, ':balienummer' => $updatedBalienummer, ':stoel' => $updatedStoelnummer, ':passagiernummer' => $passagiernummer]);
 
-        header("Location: edit.php?passagiernummer=$updatedPassagiernummer");
-        $melding = 'Informatie is succesvol veranderd.';
+        header("Location: edit.php?passagiernummer=$passagiernummer&melding=Informatie is succesvol veranderd.");
     }
 }
 
@@ -89,12 +80,13 @@ echo genereerHead();
     <?= genereerNav(); ?>
     <header class="container">
         <div class="header">
-            <h1>Edit Passenger Information</h1>
+            <h1>Bewerk passagiers informatie</h1>
             <?php checkInOfUitgelogd() ?>
         </div>
     </header>
     <main class="container">
         <?= $melding ?>
+        <?=checkVoorMeldingen(); ?>
         <form action="#" id="passengerForm" method="POST">
             <label for="passagiernummer">Passagiernummer:</label>
             <input type="text" name="passagiernummer" value="<?= $passagiernummer ?>" readonly>

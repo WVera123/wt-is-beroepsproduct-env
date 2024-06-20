@@ -12,7 +12,7 @@ $query = 'SELECT vluchtnummer, bestemming, gatecode, vertrektijd, maatschappijco
         FROM Vlucht
         WHERE vertrektijd > CURRENT_TIMESTAMP';
 
-$zoekVluchtnummer = isset($_POST['tekst']) ? $_POST['tekst'] : '';
+$zoekVluchtnummer = isset($_POST['parameter']) ? $_POST['parameter'] : '';
 
 if (!empty($zoekVluchtnummer)) {
   $query .= ' AND vluchtnummer = :zoek';
@@ -44,7 +44,7 @@ echo genereerHead();
       <div class="zoekbalk">
         <form action="flights.php" method="POST">
           <label for="zoek">Zoek een vluchtnummer</label>
-          <input type="text" name="tekst" id="tekst">
+          <input type="text" name="parameter" id="parameter" <?php if(isset($_POST['parameter'])): ?> value="<?= $_POST['parameter'] ?>" <?php endif?>>
           <button type="submit" name="zoek"><i class="fa fa-search"></i></button>
         </form>
       </div>

@@ -115,13 +115,13 @@ if (isset($_POST['verzend'])) {
 
             $queryInsert = $db->prepare($sqlInsert);
 
-            $data_array = [
+            $dataArray = [
               ':passagiernummer' => $passagiernummer,
               ':objectvolgnummer' => $objectvolgnummer,
               ':gewicht' => $bagageObject,
             ];
 
-            $success = $queryInsert->execute($data_array);
+            $success = $queryInsert->execute($dataArray);
           }
 
           if ($success) {
@@ -148,7 +148,7 @@ echo genereerHead();
   <main class="container">
     <form action="#" id="checkInForm" method="POST">
       <h2>Selecteer de bagage die ingecheckt moet worden</h2>
-      <?php echo $melding; ?>
+      <?= $melding; ?>
       <div class="bagage">
         <div class="bagageInhoud">
           <img src="images/trolley.png" alt="trolley">
@@ -195,7 +195,7 @@ echo genereerHead();
       <div class="luggageGrid">
         <div class="gegevens">
           <label for="passagiernummer">Passagiernummer:</label>
-          <input type="number" name="passagiernummer" id="passagiernummer" required>
+          <input type="number" name="passagiernummer" id="passagiernummer" <?php if(isset($_POST['passagiernummer'])): ?> value="<?= $_POST['passagiernummer'] ?>" <?php endif?>  required>
 
           <input type="submit" name="verzend" id="verzend" class="button" value="Verzend">
         </div>

@@ -40,16 +40,15 @@ function genereerTabel($data, $kolommen)
       if (isset($rij[$kolom])) {
         if ($kolom == 'vertrektijd' || $kolom == 'inchecktijdstip') {
           $datetime = new DateTime($rij[$kolom]);
-          $formattedDateTime = $datetime->format('d-M-Y H:i');
-          $htmlTabel .= '<td>' . $formattedDateTime . '</td>';
-        }else if($kolom == 'passagiernummer'){
-          $editPassagierLink = "<a href='edit.php?passagiernummer=$rij[$kolom]'>$rij[$kolom]</a>";
-          $htmlTabel .= '<td>' . $editPassagierLink . '</td>';
-        }else if($kolom == 'vluchtnummer' && $huidigePagina == '/GelreAirport/allFlights.php'){
-          $passagierLink = "<a href='allPassengers.php?vluchtnummer=$rij[$kolom]'>$rij[$kolom]</a>";
-          $htmlTabel .= '<td>' . $passagierLink . '</td>';
-        } 
-        else {
+          $geformatteerdDateTime = $datetime->format('d-M-Y H:i');
+          $htmlTabel .= '<td>' . $geformatteerdDateTime . '</td>';
+        } else if ($kolom == 'passagiernummer') {
+          $bewerkPassagierLink = "<a href='edit.php?passagiernummer=$rij[$kolom]'>$rij[$kolom]</a>";
+          $htmlTabel .= '<td>' . $bewerkPassagierLink . '</td>';
+        } else if ($kolom == 'vluchtnummer' && $huidigePagina == '/GelreAirport/allFlights.php') {
+          $vluchtPassagierLink = "<a href='allPassengers.php?vluchtnummer=$rij[$kolom]'>$rij[$kolom]</a>";
+          $htmlTabel .= '<td>' . $vluchtPassagierLink . '</td>';
+        } else {
           $htmlTabel .= '<td>' . $rij[$kolom] . '</td>';
         }
       } else {
@@ -64,30 +63,46 @@ function genereerTabel($data, $kolommen)
   return $htmlTabel;
 }
 
-function bepaalBagageType($objectType, $quantityField, $weightField) {
+function bepaalBagageType($typeObject, $hoeveelheidObjecten, $gewichtObject)
+{
   $bagageObjecten = [];
   $totaleGewicht = 0;
-  if (isset($_POST[$objectType])) {
-    $quantity = $_POST[$quantityField];
-    $weight = $_POST[$weightField];
-    for ($i = 0; $i < $quantity; $i++) {
-      $individualWeight = $weight / $quantity;
-      $bagageObjecten[] = $individualWeight;
-      $totaleGewicht += $individualWeight;
+  if (isset($_POST[$typeObject])) {
+    $hoeveelheid = $_POST[$hoeveelheidObjecten];
+    $gewicht = $_POST[$gewichtObject];
+    for ($i = 0; $i < $hoeveelheid; $i++) {
+      $gewichtPs = $gewicht / $hoeveelheid;
+      $bagageObjecten[] = $gewichtPs;
+      $totaleGewicht += $gewichtPs;
     }
   }
   return [$bagageObjecten, $totaleGewicht];
 }
 
-function checkBestaanKolom($db, $tabelnaam, $kolomnaam, $waarde) {
+function checkBestaanKolom($db, $tabelnaam, $kolomnaam, $waarde, $kolomnaam2 = null, $waarde2 = null)
+{
   $query = "SELECT COUNT(*) AS aantal 
-            FROM $tabelnaam 
-            WHERE $kolomnaam = :value";
+              FROM $tabelnaam 
+              WHERE $kolomnaam = :waarde";
+
+  if (!empty($kolomnaam2) && !empty($waarde2)) {
+    $query .= " AND $kolomnaam2 = :waardeTwee";
+  }
+
   $data = $db->prepare($query);
-  $data->execute([':value' => $waarde]);
+
+  $data->bindParam(':waarde', $waarde);
+
+  if (!empty($kolomnaam2) && !empty($waarde2)) {
+    $data->bindParam(':waardeTwee', $waarde2);
+  }
+
+  $data->execute();
+
   $resultaat = $data->fetch(PDO::FETCH_ASSOC);
   return $resultaat['aantal'] > 0;
 }
+
 
 function selecteerMaatschappij($db)
 {

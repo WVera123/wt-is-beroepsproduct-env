@@ -77,9 +77,9 @@ echo genereerHead();
       <form class="loginForm" action="login.php" method="post">
         <div class="formGroup">
           <label for="choice">Wilt u inloggen als passagier of medewerker?</label>
-          <select name="choice" id="choice" required>
-            <option value="passagier" selected>Passagier</option>
-            <option value="medewerker">Medewerker</option>
+          <select name="choice" id="choice" required> <!-- Zet optie naar 'selected' wanneer een gebruiker formulier heeft verzonden.-->
+            <option value="passagier" <?php (isset($_POST['choice']) && $_POST['choice'] == 'passagier') ? 'selected' : '' ?>>Passagier</option>
+            <option value="medewerker" <?php (isset($_POST['choice']) && $_POST['choice'] == 'medewerker') ? 'selected' : '' ?>>Medewerker</option>
           </select>
         </div>
         <div class="formGroup">

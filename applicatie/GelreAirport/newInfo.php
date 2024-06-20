@@ -115,7 +115,7 @@ if (isset($_POST['nieuwePassagier'])) {
               SELECT :passagiernummer, :naam, :vluchtnummer, :geslacht, :balienummer, :stoel, :inchecktijdstip, :wachtwoord';
       $query = $db->prepare($sql);
 
-      $data_array = [
+      $dataArray = [
         ':passagiernummer' => $passagiernummer,
         ':naam' => $achternaam,
         ':vluchtnummer' => $vluchtnummer,
@@ -125,7 +125,7 @@ if (isset($_POST['nieuwePassagier'])) {
         ':inchecktijdstip' => $incheckDatumTijd,
         ':wachtwoord' => $passwordhash
       ];
-      $succes = $query->execute($data_array);
+      $succes = $query->execute($dataArray);
 
       if ($succes) {
         $melding = 'Gebruiker is geregistreerd!';
@@ -191,7 +191,7 @@ if (isset($_POST['nieuweVlucht'])) {
             VALUES(:vluchtnummer, :bestemming, :gatecode, :max_aantal, :max_gewicht_pp, :max_totaalgewicht, :vertrektijd, :maatschappijcode)';
     $query = $db->prepare($sql);
 
-    $data_array = [
+    $dataArray = [
       ':vluchtnummer' => $vluchtnummer,
       ':bestemming' => $bestemming,
       ':gatecode' => $gatecode,
@@ -202,7 +202,7 @@ if (isset($_POST['nieuweVlucht'])) {
       ':maatschappijcode' => $maatschappijcode
     ];
 
-    $succes = $query->execute($data_array);
+    $succes = $query->execute($dataArray);
 
     if ($succes) {
       $melding = 'Vlucht is toegevoegd!';
