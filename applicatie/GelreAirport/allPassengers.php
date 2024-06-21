@@ -16,7 +16,7 @@ $db = maakVerbinding();
 
 $query = 'SELECT passagiernummer, naam, vluchtnummer, balienummer, stoel, inchecktijdstip
           FROM Passagier
-          WHERE passagiernummer IS NULL'; //Ongeldig statement om ervoor te zorgen dat er pas een passagier wordt laten zien als een gebruiker een passagiernummer of vluchtnummer heeft ingevoerd.
+          WHERE passagiernummer IS NULL'; //Statement zonder resultaten om ervoor te zorgen dat er pas een passagier wordt laten zien als een gebruiker een passagiernummer of vluchtnummer heeft ingevoerd.
 
 $zoekPassagiernummer = isset($_POST['nummer']) ? $_POST['nummer'] : '';
 
@@ -63,7 +63,7 @@ echo genereerHead();
           </div>
         </form>
       </div>
-      <?=genereerTabel($data, $kolommen); ?>
+      <?= genereerTabel($data, $kolommen); ?>
     </div>
   </main>
   <?= genereerFooter(); ?>

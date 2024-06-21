@@ -9,8 +9,8 @@ require_once 'components/header.php';
 $db = maakVerbinding();
 
 $query = 'SELECT vluchtnummer, bestemming, gatecode, vertrektijd, maatschappijcode
-        FROM Vlucht
-        WHERE vertrektijd > CURRENT_TIMESTAMP';
+          FROM Vlucht
+          WHERE vertrektijd > CURRENT_TIMESTAMP';
 
 $zoekVluchtnummer = isset($_POST['parameter']) ? $_POST['parameter'] : '';
 
@@ -54,5 +54,3 @@ echo genereerHead();
   <?= genereerFooter();?>
 </body>
 </html>
-
-  

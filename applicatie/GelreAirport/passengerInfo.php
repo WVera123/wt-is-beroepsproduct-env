@@ -32,10 +32,8 @@ echo genereerHead();
     <h2>Passagier <?= $_SESSION['passagier']?></h2>
   </header>
   <main class="container">
-  <?= genereerTabel($data, $kolommen); ?>
+    <?= genereerTabel($data, $kolommen); ?>
   </main>
   <?= genereerFooter();?>
 </body>
 </html>
-
-  

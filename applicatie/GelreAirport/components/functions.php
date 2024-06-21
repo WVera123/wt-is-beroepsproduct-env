@@ -104,53 +104,19 @@ function checkBestaanKolom($db, $tabelnaam, $kolomnaam, $waarde, $kolomnaam2 = n
 }
 
 
-function selecteerMaatschappij($db)
+function selecteerOptie($table, $column)
 {
   $db = maakVerbinding();
 
-  $query = "SELECT maatschappijcode
-            FROM Maatschappij";
-  $maatschappijen = $db->prepare($query);
-  $maatschappijen->execute();
-  $maatschappijen = $maatschappijen->fetchAll();
+  $query = "SELECT DISTINCT $column FROM $table";
+  $stmt = $db->prepare($query);
+  $stmt->execute();
+  $results = $stmt->fetchAll();
 
-  foreach ($maatschappijen as $maatschappij) {
-    $maatschappijCode = $maatschappij['maatschappijcode'];
-    echo "<option value='$maatschappijCode'>$maatschappijCode</option>";
-  }
-}
-
-function selecteerGate($db)
-{
-  $db = maakVerbinding();
-
-  $query = "SELECT gatecode
-            FROM Gate";
-  $gates = $db->prepare($query);
-  $gates->execute();
-  $gates = $gates->fetchAll();
-
-  foreach ($gates as $gate) {
-    $gatecode = $gate['gatecode'];
-    $geselecteerd = (isset($_POST['gatecode']) && $_POST['gatecode'] == $gatecode) ? 'selected' : '';
-    echo "<option value='$gatecode' $geselecteerd>$gatecode</option>";
-  }
-}
-
-function selecteerBalie($db)
-{
-  $db = maakVerbinding();
-
-  $query = "SELECT balienummer
-            FROM Balie";
-  $balies = $db->prepare($query);
-  $balies->execute();
-  $balies = $balies->fetchAll();
-
-  foreach ($balies as $balie) {
-    $balienummer = $balie['balienummer'];
-    $geselecteerd = (isset($_POST['balienummer']) && $_POST['balienummer'] == $balienummer) ? 'selected' : '';
-    echo "<option value='$balienummer' $geselecteerd>$balienummer</option>";
+  foreach ($results as $result) {
+    $value = $result[$column];
+    $geselecteerd = (isset($_POST[$column]) && $_POST[$column] == $value) ? 'selected' : '';
+    echo "<option value='$value' $geselecteerd>$value</option>";
   }
 }
 

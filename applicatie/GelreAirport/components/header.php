@@ -1,5 +1,6 @@
 <?php
-function genereerNav(){
+function genereerNav()
+{
   $html = <<<NAVIGATION
   <nav class="navbar">
     <h1 class="logo">Gelre Airport</h1>

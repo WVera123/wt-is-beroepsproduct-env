@@ -1,5 +1,6 @@
 <?php
-function genereerFooter(){
+function genereerFooter()
+{
   $html = <<<FOOTER
   <footer>
     <div class="footer">

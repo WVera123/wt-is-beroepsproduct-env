@@ -103,7 +103,7 @@ echo genereerHead();
           <label for="gatecode">Gatecode:</label>
           <select name="gatecode" id="gatecode">
             <option value="null">Kies een gatecode</option>
-            <?= selecteerGate($db) ?>
+            <?= selecteerOptie('Gate', 'gatecode'); ?>
           </select>
 
           <label for="max_aantal">Max. aantal passagiers*:</label>
@@ -123,7 +123,7 @@ echo genereerHead();
 
           <label for="maatschappijcode">Maatschappijcode*:</label>
           <select name="maatschappijcode" id="maatschappijcode" value="<?= isset($_POST['maatschappijcode']) ? $_POST['maatschappijcode'] : '' ?>" required>
-            <?= selecteerMaatschappij($db) ?>
+            <?= selecteerOptie('Maatschappij', 'maatschappijcode'); ?>
           </select>
         </div>
         <input type="submit" name="nieuweVlucht" id="nieuweVlucht" class="button" value="Verzend">

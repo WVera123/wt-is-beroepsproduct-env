@@ -1,5 +1,6 @@
 <?php
-function genereerHead() {
+function genereerHead()
+{
   $html = <<<HEAD
   <!DOCTYPE html>
   <html lang="nl">

@@ -146,18 +146,13 @@ echo genereerHead();
           <label for="geslacht">Geslacht</label>
           <select name="geslacht" id="geslacht">
             <option value="null">Kies een geslacht</option>
-            <option value="V" <?php echo (isset($_POST['geslacht']) && $_POST['geslacht'] == 'V') ? 'selected' : ''; ?>>V
-            </option>
-            <option value="M" <?php echo (isset($_POST['geslacht']) && $_POST['geslacht'] == 'M') ? 'selected' : ''; ?>>M
-            </option>
-            <option value="x" <?php echo (isset($_POST['geslacht']) && $_POST['geslacht'] == 'x') ? 'selected' : ''; ?>>x
-            </option>
+            <?= selecteerOptie('Passagier', 'geslacht'); ?>
           </select>
 
           <label for="balienummer">Balienummer:</label>
           <select name="balienummer" id="balienummer">
             <option value="null">Kies een balienummer</option>
-            <?= selecteerBalie($db) ?>
+            <?= selecteerOptie('Balie', 'balienummer'); ?>
           </select>
 
           <label for="stoel">Stoelnummer:</label>

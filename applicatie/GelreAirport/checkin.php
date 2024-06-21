@@ -41,8 +41,8 @@ if (isset($_POST['verzend'])) {
 
       // Check of passagiernummer bestaat
       $queryCheckPassagierNum = "SELECT COUNT(*) AS count 
-                            FROM Passagier 
-                            WHERE passagiernummer = :passagiernummer";
+                                FROM Passagier 
+                                WHERE passagiernummer = :passagiernummer";
       $dataCheckPassagierNum = $db->prepare($queryCheckPassagierNum);
       $dataCheckPassagierNum->execute([':passagiernummer' => $passagiernummer]);
       $resultPassagiernummer = $dataCheckPassagierNum->fetch(PDO::FETCH_ASSOC);
@@ -68,8 +68,8 @@ if (isset($_POST['verzend'])) {
 
         //Query om huidige incheckte gewicht te krijgen.
         $sqlGewicht = 'SELECT SUM(gewicht) AS huidigGewicht
-                     FROM BagageObject
-                     WHERE passagiernummer =  :passagiernummer';
+                      FROM BagageObject
+                      WHERE passagiernummer =  :passagiernummer';
         $queryGewicht = $db->prepare($sqlGewicht);
 
         $queryGewicht->execute([':passagiernummer' => $passagiernummer]);
@@ -111,7 +111,7 @@ if (isset($_POST['verzend'])) {
           foreach ($bagageObjecten as $bagageObject) {
             $objectvolgnummer += 1;
             $sqlInsert = 'INSERT INTO BagageObject (passagiernummer, objectvolgnummer, gewicht) 
-                        VALUES (:passagiernummer, :objectvolgnummer, :gewicht)';
+                          VALUES (:passagiernummer, :objectvolgnummer, :gewicht)';
 
             $queryInsert = $db->prepare($sqlInsert);
 
@@ -195,7 +195,7 @@ echo genereerHead();
       <div class="luggageGrid">
         <div class="gegevens">
           <label for="passagiernummer">Passagiernummer:</label>
-          <input type="number" name="passagiernummer" id="passagiernummer" <?php if(isset($_POST['passagiernummer'])): ?> value="<?= $_POST['passagiernummer'] ?>" <?php endif?>  required>
+          <input type="number" name="passagiernummer" id="passagiernummer" <?php if (isset($_POST['passagiernummer'])): ?> value="<?= $_POST['passagiernummer'] ?>" <?php endif ?> required>
 
           <input type="submit" name="verzend" id="verzend" class="button" value="Verzend">
         </div>
