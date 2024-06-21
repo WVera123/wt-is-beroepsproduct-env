@@ -18,7 +18,7 @@ if (!isset($_GET['passagiernummer'])) {
   header("location:allPassengers.php?melding=Geen passagier geselecteerd.");
 }
 
-$passagiernummer = isset($_GET['passagiernummer']) ? $_GET['passagiernummer'] : '';
+$medewerkernummer = isset($_GET['passagiernummer']) ? $_GET['passagiernummer'] : '';
 
 $db = maakVerbinding();
 
@@ -28,12 +28,12 @@ $query = 'SELECT passagiernummer, naam, vluchtnummer, balienummer, stoel, inchec
 
 $data = $db->prepare($query);
 
-$data->bindParam(':passagiernummer', $passagiernummer);
+$data->bindParam(':passagiernummer', $medewerkernummer);
 
 $data->execute();
 
 while ($rij = $data->fetch()) {
-  $passagiernummer = $rij['passagiernummer'];
+  $medewerkernummer = $rij['passagiernummer'];
   $naam = $rij['naam'];
   $vluchtnummer = $rij['vluchtnummer'];
   $balienummer = $rij['balienummer'];
@@ -66,9 +66,9 @@ if (isset($_POST['update'])) {
                     WHERE passagiernummer = :passagiernummer';
 
     $updateData = $db->prepare($updateQuery);
-    $updateData->execute([':vluchtnummer' => $updatedVluchtnummer, ':balienummer' => $updatedBalienummer, ':stoel' => $updatedStoelnummer, ':passagiernummer' => $passagiernummer]);
+    $updateData->execute([':vluchtnummer' => $updatedVluchtnummer, ':balienummer' => $updatedBalienummer, ':stoel' => $updatedStoelnummer, ':passagiernummer' => $medewerkernummer]);
 
-    header("Location: edit.php?passagiernummer=$passagiernummer&melding=Informatie is succesvol veranderd.");
+    header("Location: edit.php?passagiernummer=$medewerkernummer&melding=Informatie is succesvol veranderd.");
   }
 }
 
@@ -88,7 +88,7 @@ echo genereerHead();
     <?= checkVoorMeldingen(); ?>
     <form action="#" id="passengerForm" method="POST">
       <label for="passagiernummer">Passagiernummer:</label>
-      <input type="text" name="passagiernummer" value="<?= $passagiernummer ?>" readonly>
+      <input type="text" name="passagiernummer" value="<?= $medewerkernummer ?>" readonly>
 
       <label for="naam">Naam:</label>
       <input type="text" name="naam" value="<?= $naam ?>" readonly>

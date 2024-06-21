@@ -45,7 +45,8 @@ echo genereerHead();
       <div class="persoon">
         <h2>Voor medewerkers</h2>
         <a href="allFlights.php" class="button">Bekijk alle vluchten</a>
-        <a href="newInfo.php" class="button">Voer nieuwe gegevens in</a>
+        <a href="newPassenger.php" class="button">Voer een nieuwe passagier in</a>
+        <a href="newFlight.php" class="button">Voer een nieuwe vlucht in</a>
       </div>
     </div>
   </main>

@@ -15,7 +15,7 @@ $fouten = [];
 
 if (isset($_POST['nieuwePassagier'])) {
   $db = maakVerbinding();
-  $passagiernummer = $_POST['passagiernummer'];
+  $medewerkernummer = $_POST['passagiernummer'];
   $achternaam = $_POST['achternaam'];
   $vluchtnummer = $_POST['vluchtnummer'];
   $geslacht = $_POST['geslacht'];
@@ -28,7 +28,7 @@ if (isset($_POST['nieuwePassagier'])) {
   $wachtwoordCheck = $_POST['wachtwoordCheck'];
 
   // Check of passagiernummer al bestaat
-  if (checkBestaanKolom($db, 'Passagier', 'passagiernummer', $passagiernummer)) {
+  if (checkBestaanKolom($db, 'Passagier', 'passagiernummer', $medewerkernummer)) {
     $fouten[] = 'Dit passagiernummer is al in gebruik.';
   }
 
@@ -95,7 +95,7 @@ if (isset($_POST['nieuwePassagier'])) {
       $query = $db->prepare($sql);
 
       $dataArray = [
-        ':passagiernummer' => $passagiernummer,
+        ':passagiernummer' => $medewerkernummer,
         ':naam' => $achternaam,
         ':vluchtnummer' => $vluchtnummer,
         ':geslacht' => $geslacht,

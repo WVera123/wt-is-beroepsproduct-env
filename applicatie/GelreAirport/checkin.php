@@ -19,7 +19,7 @@ if (isset($_POST['verzend'])) {
     $melding = "U kunt alleen uw eigen bagage inchecken, het ingevoerde passagiernummer is onjuist.";
   } else {
     $totaleGewicht = 0;
-    $passagiernummer = $_POST['passagiernummer'];
+    $medewerkernummer = $_POST['passagiernummer'];
     $bagageObjecten = [];
     //Gebruik van list(), omdat het efficiënt bagage objecten met het verbonden gewicht aan variabelen toewijst.
     list($kofferObjecten, $gewichtKoffer) = bepaalBagageType('objectKoffer', 'hoeveelheidKoffer', 'gewichtKoffer');
@@ -44,10 +44,10 @@ if (isset($_POST['verzend'])) {
                                 FROM Passagier 
                                 WHERE passagiernummer = :passagiernummer";
       $dataCheckPassagierNum = $db->prepare($queryCheckPassagierNum);
-      $dataCheckPassagierNum->execute([':passagiernummer' => $passagiernummer]);
+      $dataCheckPassagierNum->execute([':passagiernummer' => $medewerkernummer]);
       $resultPassagiernummer = $dataCheckPassagierNum->fetch(PDO::FETCH_ASSOC);
 
-      if (!checkBestaanKolom($db, 'Passagier', 'passagiernummer', $passagiernummer)) {
+      if (!checkBestaanKolom($db, 'Passagier', 'passagiernummer', $medewerkernummer)) {
         $melding = 'Deze passagier bestaat niet.';
       } else {
 
@@ -57,7 +57,7 @@ if (isset($_POST['verzend'])) {
                           WHERE passagiernummer =  :passagiernummer';
         $queryObjectnummer = $db->prepare($sqlObjectnummer);
 
-        $queryObjectnummer->execute([':passagiernummer' => $passagiernummer]);
+        $queryObjectnummer->execute([':passagiernummer' => $medewerkernummer]);
 
         $resultaatObjectnummer = $queryObjectnummer->fetch();
         $objectvolgnummer = $resultaatObjectnummer['huidigNummer'] ?? -1;
@@ -72,7 +72,7 @@ if (isset($_POST['verzend'])) {
                       WHERE passagiernummer =  :passagiernummer';
         $queryGewicht = $db->prepare($sqlGewicht);
 
-        $queryGewicht->execute([':passagiernummer' => $passagiernummer]);
+        $queryGewicht->execute([':passagiernummer' => $medewerkernummer]);
 
         $resultaatGewicht = $queryGewicht->fetch();
         $totaleGewicht += $resultaatGewicht['huidigGewicht'];
@@ -86,7 +86,7 @@ if (isset($_POST['verzend'])) {
 
         $queryMax = $db->prepare($sqlMax);
 
-        $queryMax->execute([':passagiernummer' => $passagiernummer]);
+        $queryMax->execute([':passagiernummer' => $medewerkernummer]);
 
         $resultaatMax = $queryMax->fetch();
 
@@ -116,7 +116,7 @@ if (isset($_POST['verzend'])) {
             $queryInsert = $db->prepare($sqlInsert);
 
             $dataArray = [
-              ':passagiernummer' => $passagiernummer,
+              ':passagiernummer' => $medewerkernummer,
               ':objectvolgnummer' => $objectvolgnummer,
               ':gewicht' => $bagageObject,
             ];

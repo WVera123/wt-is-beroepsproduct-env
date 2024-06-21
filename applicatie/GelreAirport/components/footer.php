@@ -14,7 +14,8 @@ function genereerFooter()
           <li><a href="flights.php">Vluchten</a></li>
           <li><a href="checkin.php">Check-in</a></li>
           <li><a href="passengerInfo.php">Gegevens</a></li>
-          <li><a href="newInfo.php">Nieuwe gegevens</a></li>
+          <li><a href="newPassenger.php">Nieuwe passagier</a></li>
+          <li><a href="newFlight.php">Nieuwe vlucht</a></li>
           <li><a href="allFlights.php">Alle vluchten</a></li>
         </ul>
       </nav>
