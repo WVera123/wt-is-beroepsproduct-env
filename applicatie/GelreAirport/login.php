@@ -84,7 +84,7 @@ echo genereerHead();
         </div>
         <div class="formGroup">
           <label for="nummer">Nummer:</label>
-          <input type="text" id="nummer" name="nummer" required>
+          <input type="text" id="nummer" name="nummer" value="<?= isset($_POST['nummer']) ? $_POST['nummer'] : '' ?>" required>
         </div>
         <div class="formGroup">
           <label for="wachtwoord">Wachtwoord:</label>
