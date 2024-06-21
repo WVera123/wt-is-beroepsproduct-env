@@ -18,7 +18,8 @@ function genereerNav(){
         <ul>
           <li><a href="allFlights.php">Alle vluchten</a></li>
           <li><a href="allPassengers.php">Alle passagiers</a></li>
-          <li><a href="newInfo.php">Gegevensinvoer</a></li>
+          <li><a href="newPassenger.php">Passagier invoer</a></li>
+          <li><a href="newFlight.php">Vlucht invoer</a></li>
         </ul>
       </li>
     </ul>

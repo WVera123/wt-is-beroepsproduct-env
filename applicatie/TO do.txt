@@ -1,2 +1,1 @@
-improve multi-tier
-remove regiser.php
+new info opsplitsen
